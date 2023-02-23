@@ -19,6 +19,9 @@ public enum MappingStrategy
     Schwarz_Christoffel_Mapping = 7 ,
     
     Hyperbolic_Mapping          = 8 ,
+    cornerific_tapered2         = 9 ,
+    Non_axial_2_pinch           = 10,
+    
     
 }
 

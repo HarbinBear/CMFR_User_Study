@@ -29,16 +29,16 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _MappingStrategy: 2
-    - _SquelchedGridMappingBeta: 0.599
+    - _SquelchedGridMappingBeta: 0.052
     - _eyeX: 0.5
     - _eyeY: 0.5
-    - _fx: 0.119
-    - _fy: 0.119
+    - _fx: 0.3
+    - _fy: 0.3
     - _iApplyLogMap1: 1
     - _iApplyLogMap2: 1
     - _iResolutionX: 1440
     - _iResolutionY: 1600
     - _kernel: 1
-    - _scaleRatio: 2.017
+    - _scaleRatio: 2
     m_Colors: []
   m_BuildTextureStacks: []

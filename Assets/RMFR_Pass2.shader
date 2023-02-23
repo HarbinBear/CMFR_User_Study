@@ -110,6 +110,8 @@ Shader "Custom/RMFR_Pass2"
 						
 				}
 
+
+
 				if( _MappingStrategy == 8 )
 				{
 					// hyperbolic

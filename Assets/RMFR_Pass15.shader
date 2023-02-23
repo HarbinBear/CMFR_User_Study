@@ -132,10 +132,58 @@ Shader "RMFR_Pass15"
 				}
 
 
+				// Blended E-Grid mapping
+				if ( _MappingStrategy == 3 )
+				{
+	
+					float beta = _SquelchedGridMappingBeta;
+					float a = beta + 1 - beta * xx;	
+					float b = beta + 1 - beta * yy;	
+					u = x * sqrt( ( yy * b - a*b ) / ( xx*yy - a*b ) );
+					v = y * sqrt( ( xx * b - a*b ) / ( xx*yy - a*b ) );
+						
+				}
+
+
+				// FG Squiricle Mapping
+				// Square to Disk
+				if( _MappingStrategy == 4 )
+				{
+					float var1 = sqrt( xx + yy - xx * yy );
+					float var2 = sqrt( xx + yy );
+					u = x * var1 / var2 ;
+					v = y * var1 / var2 ;
+				}
+
+
+				// 2-Squircular mapping
+				// Square to Disk
+				if( _MappingStrategy == 5 )
+				{
+					float var1 = sqrt( 1 + xx * yy );
+					u = x / var1 ;
+					v = y / var1 ;
+				}
 
 
 
-
+				// hyperbolic
+				if( _MappingStrategy == 8 )
+				{
+					float a = 0.8;
+					float aa = a * a;
+					float bb = aa  / ( 1 - aa );
+					if( abs(x) > abs(y) )
+					{
+						u = sign(x) * sqrt( aa*xx + aa/bb*yy );
+						v = y;
+					}
+					if( abs(y) >= abs(x) )
+					{
+						v = sign(y) * sqrt( aa*yy + aa/bb*xx );
+						u = x;
+					}
+				}
 
 
 					

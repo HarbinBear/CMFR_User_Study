@@ -110,10 +110,111 @@ Shader "RMFR_Pass25"
 					v = tt.y / sqrt( 1- xx ) ;
 				}
 
+
+				// Blended E-Grid mapping
+				if( _MappingStrategy == 3 )
+				{
+
+					float beta = _SquelchedGridMappingBeta;
+					float ax = beta + 1 + beta*xx - yy ;
+					float ay = beta + 1 + beta*yy - xx ;
+					float c = 4 * beta * ( beta + 1 ) ;
+					u = sign( tt.x ) / sqrt( 2 * beta ) * sqrt( ax - sqrt( ax*ax - c*xx )); 
+					v = sign( tt.y ) / sqrt( 2 * beta ) * sqrt( ay - sqrt( ay*ay - c*yy )); 
+						
+				}
+
+
+				// FG-Spuircular Mapping with & without S and K
+				// Disc to Square Mapping
+				if( _MappingStrategy == 4 )
+				{
+
+					float S = 1.0f;
+					float SS = S * S;
+					if( tt.x == 0 || tt.y == 0 ) discard;
+						
+					float temp = ( xx + yy ) * ( xx + yy - 4 * SS * xx * yy ) ;   // float temp = ( xx + yy ) * ( xx + yy - 4 * SS * xx * yy / ( xx + yy )) ;
+					if( temp < 0 ) return fixed4(0,1,0,1);
+					temp = sqrt( temp );
+					temp = xx + yy - temp ;
+					if( temp < 0 ) return fixed4(0,1,0,1);
+					temp = sqrt( temp );
+					temp = sign( tt.x * tt.y ) / S / sqrt(2) * temp ;     // temp = sign( x * y ) / S / sqrt(2) * temp * sqrt( xx + yy ) ;
+						
+					u = temp / tt.y;
+					v = temp / tt.x;
+					
+				}
+
+
+				// 2-Squircular mapping
+				// Disc to Square mapping
+				if( _MappingStrategy == 5 )
+				{
+					float var1 = sqrt( 1 - sqrt( 1 - 4 * xx * yy ) );
+					var1 = var1 * sign( tt.x * tt.y ) / ( sqrt(2) );
+					u = var1 / tt.y ;
+					v = var1 / tt.x ;
+				}
 				
 
+				// hyperbolic
+				if( _MappingStrategy == 8 )
+				{
+					float a = 0.5;
+					float aa = a * a;
 
+					float bb = aa  / ( 1 - aa );
+					if( abs(tt.x) > abs(tt.y) )
+					{
+						u = sign(tt.x) * sqrt( xx/aa - yy/bb );
+						v = tt.y;
+					}
+					if( abs(tt.y) >= abs(tt.x) )
+					{
+						v = sign(tt.y) * sqrt( yy/aa - xx/bb );
+						u = tt.x;
+					}
+				}
 
+				
+				// cornerific tapered2 mapping
+				// Disc to Square
+				if( _MappingStrategy == 9 )
+				{					
+					float var0 = xx + yy ;
+					float var1 = 2 - var0 ;
+					float var2 = 4 * xx * yy * var1;
+					var2 = var0 - var2 ;
+					var2 = var0 * var2 ;
+					var2 = sqrt(var2) ;
+					var2 = var0 - var2 ;
+					var2 /= 2 * var1 ;
+					var2 = sqrt(var2) ;
+					var2 *= sign( tt.x * tt.y );
+					
+					u = var2 / tt.y;
+					v = var2 / tt.x;
+				}
+
+				
+				// Non-axial 2-pinch mapping
+				// Disc to Square
+				if( _MappingStrategy == 10 )
+				{
+					
+					float var0 = xx + yy ;
+					float var1 = var0 - 4*xx*yy;
+					var1 *= var0;
+					var1 = pow( var1 , 0.5 );
+					var1 = var0 - 2 * xx * yy - var1;
+					var1 = pow( var1 , 0.25 );
+					var1 *= sign( tt.x * tt.y ) / (  pow( 2 , 0.25 ) );
+					
+					u = var1 / tt.y ;
+					v = var1 / tt.x ;
+				}
 
 
 					

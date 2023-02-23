@@ -79,20 +79,20 @@ Material:
     - _Parallax: 0.02
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
-    - _SquelchedGridMappingBeta: 0.599
+    - _SquelchedGridMappingBeta: 0.052
     - _SrcBlend: 1
     - _UVSec: 0
     - _ZWrite: 1
     - _bSampleDensityWithNoise: 1
     - _eyeX: 0.5
     - _eyeY: 0.5
-    - _fx: 0.119
-    - _fy: 0.119
+    - _fx: 0.3
+    - _fy: 0.3
     - _iApplyLogMap2: 1
     - _iResolutionX: 1440
     - _iResolutionY: 1600
     - _kernel: 1
-    - _scaleRatio: 2.017
+    - _scaleRatio: 2
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}

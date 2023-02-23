@@ -135,9 +135,7 @@ Shader "Custom/RMFR_Pass1"
 						
 					u = 0.5 * sqrt( 2 + xx - yy + 2 * sqrt(2) * x ) - 0.5 * sqrt( 2 + xx - yy - 2 * sqrt(2) * x );
 					v = 0.5 * sqrt( 2 - xx + yy + 2 * sqrt(2) * y ) - 0.5 * sqrt( 2 - xx + yy - 2 * sqrt(2) * y ) ;
-					
-
-						
+											
 				}
 
 					
