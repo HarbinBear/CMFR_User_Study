@@ -193,8 +193,8 @@ Shader "Custom/RMFR_Pass11"
 					
 					float2 uv = float2(u,v);
 					uv = ( uv + 1.0 ) / 2.0 ;
-					if( uv.x < 0.0 || uv.x > 1.0 ){ return fixed4(0,0,1,1); }	
-					if( uv.y < 0.0 || uv.y > 1.0 ){ return fixed4(0,0,1,1); }	
+					if( uv.x < 0.0 || uv.x > 1.0 ){ return fixed4(0,0,1,0.66); }	
+					if( uv.y < 0.0 || uv.y > 1.0 ){ return fixed4(0,0,1,0.66); }	
 					return fixed4( uv.x , uv.y , 0 , 1);
 				}
 				

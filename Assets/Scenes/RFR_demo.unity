@@ -348,15 +348,16 @@ MonoBehaviour:
   Pass1Material: {fileID: 2100000, guid: 48a9e02c328413f4f9e0855bca0e2773, type: 2}
   Pass2Material: {fileID: 2100000, guid: 6c73d523034daaa4495a1685dd682eb9, type: 2}
   DenoiseMaterial: {fileID: 2100000, guid: e22c161034b79fb4bb8d55209612a7e1, type: 2}
-  sigma: 2
-  fx: 0.3
-  fy: 0.3
+  sigma: 2.2
+  fx: 0.2
+  fy: 0.2
   eyeX: 0.5
   eyeY: 0.5
   SquelchedGridMappingBeta: 0.052
-  mappingStrategy: 1
   SampleDensityWithNoise: 0
-  debugMode: 0
+  mappingStrategy: 0
+  debugMode: 1
+  outputTex: 2
   savePath: Savings
 --- !u!20 &515621403
 Camera:

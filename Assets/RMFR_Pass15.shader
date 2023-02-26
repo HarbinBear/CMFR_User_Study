@@ -186,6 +186,23 @@ Shader "RMFR_Pass15"
 				}
 
 
+				// Simple Strech
+				// square to disk
+				if(_MappingStrategy == 11 )
+				{
+					if( xx >= yy )
+					{
+						u = sign(x) * xx    / ( sqrt( xx + yy ));
+						v = sign(x) * x * y / ( sqrt( xx + yy ));
+					}
+					else
+					{
+						u = sign(y) * x * y / ( sqrt( xx + yy ));
+						v = sign(y) * yy    / ( sqrt( xx + yy ));
+					}
+				}
+
+
 					
 				if( _MappingStrategy > 0 )
 				{
@@ -199,14 +216,20 @@ Shader "RMFR_Pass15"
 
 				if( _DebugMode == 0 )
 				{
-					// if( u < 0.0 || u > 1.0 ){ return fixed4(1,0,0,1); }	
-					// if( v < 0.0 || v > 1.0 ){ return fixed4(1,0,0,1); }
 					
 					u = max( 0 , u );
 					u = min( 1 , u );
 					v = max( 0 , v );
 					v = min( 1 , v );
 				}
+				else if( _DebugMode == 1 )
+				{
+					if( u < 0.0 || u > 1.0 ){ return fixed4(1,1,1,1); }	
+					if( v < 0.0 || v > 1.0 ){ return fixed4(1,1,1,1); }
+					
+				}
+
+					
 				if( _DebugMode == 0 )
 				{
 					if( _MappingStrategy > 0 )

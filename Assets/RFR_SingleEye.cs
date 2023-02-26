@@ -6,7 +6,7 @@ using UnityEngine.Serialization;
 
 public enum MappingStrategy
 {
-    None                        = 0 ,    
+    RMFR                        = 0 ,    
     
     Elliptical_Grid_Mapping     = 1 ,
     Squelched_Grid_Mapping      = 2 ,
@@ -22,12 +22,20 @@ public enum MappingStrategy
     cornerific_tapered2         = 9 ,
     Non_axial_2_pinch           = 10,
     
-    
+    Simple_Strech               = 11,
+}
+
+public enum OutputTex
+{
+    TexturePass0,
+    TexturePass1,
+    TexturePass2,
+    TextureDenoise,
 }
 
 public enum DebugMode
 {
-    None            = 0 ,
+    Render          = 0 ,
     PixelDensity    = 1 ,
     
 }
@@ -56,21 +64,27 @@ public class RFR_SingleEye : MonoBehaviour
     [Range(0.01f, 1.0f)] 
     public float SquelchedGridMappingBeta;
 
-    [FormerlySerializedAs("MappingStrategy")] 
-    public MappingStrategy mappingStrategy;
     [Range(0, 1)] 
     public float SampleDensityWithNoise;
+    [FormerlySerializedAs("MappingStrategy")] 
+    public MappingStrategy mappingStrategy;
 
     public DebugMode debugMode;
+
+    public OutputTex outputTex;
     
     int iApplyRFRMap1;
     int iApplyRFRMap2;
 
     public string savePath;
-
+    private float fx0;
+    private float fy0;
     float sigma0;
+    private MappingStrategy mappingStrategy0;
 
     bool b_save = false;
+    
+    private float _validPercent;
 
     // Start is called before the first frame update
     void Start()
@@ -94,10 +108,29 @@ public class RFR_SingleEye : MonoBehaviour
     {
         keyControl();
         saveImages();
+        CalcPixelPercent();
         if (sigma0 != sigma)
         {
             updateTextureSize();
             sigma0 = sigma;
+        }
+
+        if( fx != fx0 )
+        {
+            CalcPixelPercent();
+            fx0 = fx;
+        }
+
+        if ( fy != fy0 )
+        {
+            CalcPixelPercent();
+            fy0 = fy;
+        }
+
+        if (mappingStrategy != mappingStrategy0)
+        {
+            mappingStrategy0 = mappingStrategy;
+            CalcPixelPercent();
         }
     }
 
@@ -105,9 +138,28 @@ public class RFR_SingleEye : MonoBehaviour
     {
         Pass1MainL();
         Pass2MainL();
-        // Pass3DenoiseL();
+        Pass3DenoiseL();
         // Graphics.Blit(TextureDenoise, dst);
-        Graphics.Blit(TexturePass2, dst);
+
+        switch (outputTex)
+        {
+            case OutputTex.TexturePass0:
+            {
+                Graphics.Blit(TexturePass0, dst);
+                break;
+            }
+            case OutputTex.TexturePass1:
+            {
+                Graphics.Blit(TexturePass1, dst);
+                break;
+            }
+            case OutputTex.TexturePass2:
+            {
+                Graphics.Blit(TexturePass2, dst);
+                break;
+            }
+                
+        }
     }
 
     void Pass1MainL()
@@ -122,6 +174,7 @@ public class RFR_SingleEye : MonoBehaviour
         Pass1Material.SetFloat("_SquelchedGridMappingBeta",SquelchedGridMappingBeta);
         Pass1Material.SetInt("_MappingStrategy" , (int)mappingStrategy);
         Pass1Material.SetInt("_DebugMode" , (int)debugMode);
+        
         
         Graphics.Blit(TexturePass0, TexturePass1, Pass1Material);
     }
@@ -139,6 +192,7 @@ public class RFR_SingleEye : MonoBehaviour
         Pass2Material.SetInt("_MappingStrategy" , (int)mappingStrategy);
         Pass2Material.SetFloat("_bSampleDensityWithNoise" ,  SampleDensityWithNoise );
         Pass2Material.SetInt("_DebugMode" , (int)debugMode);
+        Pass2Material.SetFloat("_validPercent" , _validPercent);
         
         Graphics.Blit(null, TexturePass2, Pass2Material);
     }
@@ -197,26 +251,48 @@ public class RFR_SingleEye : MonoBehaviour
     {
         if (b_save)
         {
+            b_save = false;
             Debug.Log("eyeXL:" + eyeX.ToString() + "\teyeYL:" + eyeY.ToString() + 
             "sigma:" + sigma + "\n" + "fx:" + fx.ToString() + "\tfy:" + fy.ToString());
 
-            // SaveToFile(TexturePass0, savePath + "/original_left_n.png");
+            SaveToFile(TexturePass0, savePath + "_original_left_n.png");
 
-            SaveToFile(TexturePass1, savePath +"/sigma_" +
-               sigma.ToString() + "_fx_" + fx.ToString() + "_fy_" + fy.ToString() +
-               "_eX_" + eyeX.ToString() + "_eY_" + eyeY.ToString() + "_p1.png");
+            SaveToFile(TexturePass1, savePath  + "_p1.png");
 
-            SaveToFile(TexturePass2, savePath + "/sigma_" +
-               sigma.ToString() + "_fx_" + fx.ToString() + "_fy_" + fy.ToString() +
-               "_eX_" + eyeX.ToString() + "_eY_" + eyeY.ToString() + "_p2.png");
+            SaveToFile(TexturePass2, savePath + "_p2.png");
+            //
+            // SaveToFile(TexturePass2, savePath + "/sigma_" +
+            //                          sigma.ToString() + "_fx_" + fx.ToString() + "_fy_" + fy.ToString() + "_p2.png");
+            
+            // SaveToFile(TextureDenoise, savePath + "/sigma_" +
+            //    sigma.ToString() + "_fx_" + fx.ToString() + "_fy_" + fy.ToString() +
+            //    "_eX_" + eyeX.ToString() + "_eY_" + eyeY.ToString() + "_dn.png");
 
-            SaveToFile(TextureDenoise, savePath + "/sigma_" +
-               sigma.ToString() + "_fx_" + fx.ToString() + "_fy_" + fy.ToString() +
-               "_eX_" + eyeX.ToString() + "_eY_" + eyeY.ToString() + "_dn.png");
-
-            b_save = false;
         }
 
+    }
+
+    public void CalcPixelPercent()
+    {
+        RenderTexture currentActiveRT = RenderTexture.active;
+        RenderTexture.active = TexturePass1;
+        Texture2D tex = new Texture2D(TexturePass1.width, TexturePass1.height);
+        tex.ReadPixels(new Rect(0,0,tex.width , tex.height) , 0,0);
+        Color[] colors = tex.GetPixels(0, 0, tex.width, tex.height);
+        int invalidCount = 0;
+        foreach (var color in colors)
+        {
+            if (color == Color.white)
+            {
+                invalidCount++;
+            }
+        }
+
+        int validCount = colors.Length - invalidCount;
+        float validPercent = (float)validCount / (float)colors.Length;
+        _validPercent = validPercent;
+        // UnityEngine.Object.Destroy(tex);
+        RenderTexture.active = currentActiveRT;
     }
 
     public void SaveToFile(RenderTexture renderTexture, string name)
@@ -225,21 +301,9 @@ public class RFR_SingleEye : MonoBehaviour
         RenderTexture.active = renderTexture;
         Texture2D tex = new Texture2D(renderTexture.width, renderTexture.height);
         tex.ReadPixels(new Rect(0, 0, tex.width, tex.height), 0, 0);
-        Color[] colors = tex.GetPixels(0, 0, tex.width, tex.height);
-        int RedCount = 0;
-        b_save = false;
-        foreach (var color in colors)
-        {
-            if (color == Color.red)
-            {
-                RedCount++;
-            }
-        }
-
-        Debug.Log(RedCount);
         var bytes = tex.EncodeToPNG();
         System.IO.File.WriteAllBytes(name, bytes);
-        UnityEngine.Object.Destroy(tex);
+        // UnityEngine.Object.Destroy(tex);
         RenderTexture.active = currentActiveRT;
     }
 
@@ -247,17 +311,24 @@ public class RFR_SingleEye : MonoBehaviour
     {
         GUIStyle guiStyle = new GUIStyle();
         guiStyle.fontSize = 50;
+        guiStyle.normal.textColor = Color.red;
+        
+        
         string text = string.Format(name + " = {0}", variable);
+        GUI.contentColor = Color.red;
         GUI.Label(new Rect(0, idx * 50, Screen.width, Screen.height), text, guiStyle);
     }
 
-    // void OnGUI()
-    // {
-    //     int idx = 0;
-    //     DispText(idx++, sigma, "sigma");
-    //     DispText(idx++, fx, "fx");
-    //     DispText(idx++, fy, "fy");
-    //     DispText(idx++, eyeX, "eyeX");
-    //     DispText(idx++, eyeY, "eyeY");
-    // }
+    void OnGUI()
+    {
+        int idx = 0;
+        DispText(idx++, sigma, "sigma");
+        DispText(idx++, fx, "fx");
+        DispText(idx++, fy, "fy");
+        if(debugMode > 0)DispText(idx++, _validPercent, "validPercent");
+        // DispText(idx++, eyeX, "eyeX");
+        // DispText(idx++, eyeY, "eyeY");
+        DispText(idx++ , (float)mappingStrategy , "MappingStrategy");
+        
+    }
 }

@@ -78,8 +78,8 @@ Material:
     - _ZWrite: 1
     - _eyeX: 0.5
     - _eyeY: 0.5
-    - _iResolutionX: 1524
-    - _iResolutionY: 738
+    - _iResolutionX: 800
+    - _iResolutionY: 800
     - _scaleRatio: 1.6
     m_Colors:
     - _Color: {r: 1, g: 1, b: 1, a: 1}

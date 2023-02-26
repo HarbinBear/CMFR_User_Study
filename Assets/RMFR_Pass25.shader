@@ -16,6 +16,7 @@ Shader "RMFR_Pass25"
 		
 		_bSampleDensityWithNoise("_bSampleDensityWithNoise" , float ) = 0
 		_DebugMode("_DebugMode", int ) = 0
+		_validPercent("_validPercent" , float ) = 0.78 
 
 	}
 	SubShader
@@ -64,6 +65,7 @@ Shader "RMFR_Pass25"
 			uniform int _MappingStrategy;
 			uniform float _bSampleDensityWithNoise;
 			uniform int _DebugMode;
+			uniform float _validPercent;
 
 			fixed4 frag(v2f i) : SV_Target
 			{
@@ -216,6 +218,23 @@ Shader "RMFR_Pass25"
 					v = var1 / tt.x ;
 				}
 
+				// Simple Strech
+				// Disk To Square
+				if( _MappingStrategy == 11  )
+				{
+					float var = sqrt( xx + yy );
+					if( xx > yy )
+					{
+						u = sign( tt.x ) * var;
+						v = sign( tt.x ) * var * tt.y / tt.x;
+					}
+					else
+					{
+						u = sign( tt.y ) * var * tt.x / tt.y;
+						v = sign( tt.y ) * var;
+					}
+				} 
+				
 
 					
 				// --------------------------
@@ -282,50 +301,59 @@ Shader "RMFR_Pass25"
 				
 					pq *= res ;  // pos of RectMapping Tex   [ 0 , 800 / Scale ]   // pq = fixed2( col.x ,col.y );        /// value( pos in Original Tex ) in the RectMappingTex, not the pos of it.
 				   
-					fixed2 point1 = fixed2( floor(pq.x) / res , floor(pq.y) / res ) ;
-					fixed2 point3 = fixed2( ceil(pq.x)  / res , floor(pq.y) / res ) ;   
-					fixed2 point2 = fixed2( ceil(pq.x)  / res , ceil(pq.y)  / res ) ;
-					fixed2 point4 = fixed2( floor(pq.x) / res , ceil(pq.y)  / res ) ;
-
-					// point1 += frac( sin( x + y ) * 10000.0 ) * 0.01 * ( _bSampleDensityWithNoise - 0.5 )  ;
-					// point2 += frac( sin( x + y ) * 10000.0 ) * 0.01 * ( _bSampleDensityWithNoise - 0.5 )  ; 
-					// point3 += frac( sin( x + y ) * 10000.0 ) * 0.01 * ( _bSampleDensityWithNoise - 0.5 )  ;
-					// point4 += frac( sin( x + y ) * 10000.0 ) * 0.01 * ( _bSampleDensityWithNoise - 0.5 )  ;
+					// fixed2 pt1 = fixed2( floor(pq.x) / res , floor(pq.y) / res ) ;
+					// fixed2 pt3 = fixed2( ceil(pq.x)  / res , floor(pq.y) / res ) ;   
+					// fixed2 pt2 = fixed2( ceil(pq.x)  / res , ceil(pq.y)  / res ) ;
+					// fixed2 pt4 = fixed2( floor(pq.x) / res , ceil(pq.y)  / res ) ;
 					//
-					point1 += ( tex2D( _NoiseTex , fixed2(x,y)).x - 0.5 ) * 0.01 * ( _bSampleDensityWithNoise ) ; 
-					point2 += ( tex2D( _NoiseTex , fixed2(x,y)).x - 0.5 ) * 0.01 * ( _bSampleDensityWithNoise ) ; 
-					point3 += ( tex2D( _NoiseTex , fixed2(x,y)).x - 0.5 ) * 0.01 * ( _bSampleDensityWithNoise ) ; 
-					point4 += ( tex2D( _NoiseTex , fixed2(x,y)).x - 0.5 ) * 0.01 * ( _bSampleDensityWithNoise ) ; 
+					//
+
+					if( (pq.x - 0.5) / res < 0 || (pq.x + 0.5) / res > 1 ) discard;
+					if( (pq.y - 0.5) / res < 0 || (pq.y + 0.5) / res > 1 ) discard;
+
+					fixed2 pt1 = fixed2( (pq.x - 0.5) / res ,  (pq.y - 0.5) / res ) ;
+					fixed2 pt3 = fixed2( (pq.x + 0.5)  / res , (pq.y - 0.5) / res ) ;   
+					fixed2 pt2 = fixed2( (pq.x + 0.5)  / res , (pq.y + 0.5)  / res ) ;
+					fixed2 pt4 = fixed2( (pq.x - 0.5) / res ,  (pq.y + 0.5)  / res ) ;
 
 					
-					if( point1.x < 0 || point1.x > 1 || point1.y < 0 || point1.y > 1 ) return fixed4(0,0,0,1);
-					if( point2.x < 0 || point2.x > 1 || point2.y < 0 || point2.y > 1 ) return fixed4(0,0,0,1);
-					if( point3.x < 0 || point3.x > 1 || point3.y < 0 || point3.y > 1 ) return fixed4(0,0,0,1);
-					if( point4.x < 0 || point4.x > 1 || point4.y < 0 || point4.y > 1 ) return fixed4(0,0,0,1);
+
 					
-					point1 = tex2D( _MidTex, point1 ).xy ;
-					point2 = tex2D( _MidTex, point2 ).xy ;
-					point3 = tex2D( _MidTex, point3 ).xy ;
-					point4 = tex2D( _MidTex, point4 ).xy ;
+					//
+					pt1 += ( tex2D( _NoiseTex , fixed2(x,y)).x - 0.5 ) * 0.01 * ( _bSampleDensityWithNoise ) ; 
+					pt2 += ( tex2D( _NoiseTex , fixed2(x,y)).x - 0.5 ) * 0.01 * ( _bSampleDensityWithNoise ) ; 
+					pt3 += ( tex2D( _NoiseTex , fixed2(x,y)).x - 0.5 ) * 0.01 * ( _bSampleDensityWithNoise ) ; 
+					pt4 += ( tex2D( _NoiseTex , fixed2(x,y)).x - 0.5 ) * 0.01 * ( _bSampleDensityWithNoise ) ; 
+
+					
+					if( pt1.x < 0 || pt1.x > 1 || pt1.y < 0 || pt1.y > 1 ) return fixed4(0,0,0,1);
+					if( pt2.x < 0 || pt2.x > 1 || pt2.y < 0 || pt2.y > 1 ) return fixed4(0,0,0,1);
+					if( pt3.x < 0 || pt3.x > 1 || pt3.y < 0 || pt3.y > 1 ) return fixed4(0,0,0,1);
+					if( pt4.x < 0 || pt4.x > 1 || pt4.y < 0 || pt4.y > 1 ) return fixed4(0,0,0,1);
+					
+					pt1 = tex2D( _MidTex, pt1 ).xy ;
+					pt2 = tex2D( _MidTex, pt2 ).xy ;
+					pt3 = tex2D( _MidTex, pt3 ).xy ;
+					pt4 = tex2D( _MidTex, pt4 ).xy ;
 				
 				
-					if( point1.x < 0 || point1.x > 1 || point1.y < 0 || point1.y > 1 ) return fixed4(0,0,0,1);
-					if( point2.x < 0 || point2.x > 1 || point2.y < 0 || point2.y > 1 ) return fixed4(0,0,0,1);
-					if( point3.x < 0 || point3.x > 1 || point3.y < 0 || point3.y > 1 ) return fixed4(0,0,0,1);
-					if( point4.x < 0 || point4.x > 1 || point4.y < 0 || point4.y > 1 ) return fixed4(0,0,0,1);
+					if( pt1.x < 0 || pt1.x > 1 || pt1.y < 0 || pt1.y > 1 ) return fixed4(0,0,0,1);
+					if( pt2.x < 0 || pt2.x > 1 || pt2.y < 0 || pt2.y > 1 ) return fixed4(0,0,0,1);
+					if( pt3.x < 0 || pt3.x > 1 || pt3.y < 0 || pt3.y > 1 ) return fixed4(0,0,0,1);
+					if( pt4.x < 0 || pt4.x > 1 || pt4.y < 0 || pt4.y > 1 ) return fixed4(0,0,0,1);
 				
-					point1 *= OriginRes ;
-					point2 *= OriginRes ;
-					point3 *= OriginRes ;
-					point4 *= OriginRes ;
+					pt1 *= OriginRes ;
+					pt2 *= OriginRes ;
+					pt3 *= OriginRes ;
+					pt4 *= OriginRes ;
 				
-					float s1 = 0.5 * ( point1.x * point2.y - point1.y * point2.x + point2.x * point3.y - point2.y * point3.x + point3.x * point1.y - point3.y * point1.x);
-					float s2 = 0.5 * ( point1.x * point2.y - point1.y * point2.x + point2.x * point4.y - point2.y * point4.x + point4.x * point1.y - point4.y * point1.x);
+					float s1 = 0.5 * ( pt1.x * pt2.y - pt1.y * pt2.x + pt2.x * pt3.y - pt2.y * pt3.x + pt3.x * pt1.y - pt3.y * pt1.x);
+					float s2 = 0.5 * ( pt1.x * pt2.y - pt1.y * pt2.x + pt2.x * pt4.y - pt2.y * pt4.x + pt4.x * pt1.y - pt4.y * pt1.x);
 
 					float density;
 					if( _MappingStrategy > 0 )
 					{
-						density = 1 / ( ( abs(s1) + abs(s2) ) * 0.78 );
+						density = 1 / ( ( abs(s1) + abs(s2) ) * _validPercent );
 						
 					}
 					else if (_MappingStrategy == 0 )
