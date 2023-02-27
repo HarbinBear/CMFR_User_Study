@@ -291,6 +291,7 @@ public class RFR_SingleEye : MonoBehaviour
         int validCount = colors.Length - invalidCount;
         float validPercent = (float)validCount / (float)colors.Length;
         _validPercent = validPercent;
+        colors = null;
         // UnityEngine.Object.Destroy(tex);
         RenderTexture.active = currentActiveRT;
     }

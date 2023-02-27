@@ -168,6 +168,7 @@ Shader "RMFR_Pass15"
 
 
 				// hyperbolic
+				// Spuare to Disk
 				if( _MappingStrategy == 8 )
 				{
 					float a = 0.8;
@@ -216,6 +217,9 @@ Shader "RMFR_Pass15"
 
 				if( _DebugMode == 0 )
 				{
+
+					if( u < 0.0 || u > 1.0 ){ return fixed4(1,0,0,1); }	
+					if( v < 0.0 || v > 1.0 ){ return fixed4(1,0,0,1); }
 					
 					u = max( 0 , u );
 					u = min( 1 , u );

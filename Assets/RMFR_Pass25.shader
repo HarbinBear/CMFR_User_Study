@@ -162,6 +162,7 @@ Shader "RMFR_Pass25"
 				
 
 				// hyperbolic
+				// Disc to Square
 				if( _MappingStrategy == 8 )
 				{
 					float a = 0.5;
