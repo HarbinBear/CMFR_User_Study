@@ -4,5 +4,11 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
-  m_configObjects: {}
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/RFR_demo.unity
+    guid: e653a8ac9c8aa79469262222aace688b
+  m_configObjects:
+    Unity.XR.PICO.LivePreview.Settings: {fileID: 11400000, guid: 433b2c8e2e1b0454eb1409e1ccc048c9, type: 2}
+    Unity.XR.PXR.Settings: {fileID: 11400000, guid: b9a4c1f4a2713cb4cbe1b4632faa269b, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 17925d90b282d5b409ff55aee40a89ee, type: 2}

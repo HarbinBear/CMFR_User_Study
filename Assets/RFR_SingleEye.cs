@@ -108,7 +108,7 @@ public class RFR_SingleEye : MonoBehaviour
     {
         keyControl();
         saveImages();
-        CalcPixelPercent();
+        // CalcPixelPercent();
         if (sigma0 != sigma)
         {
             updateTextureSize();
@@ -117,20 +117,20 @@ public class RFR_SingleEye : MonoBehaviour
 
         if( fx != fx0 )
         {
-            CalcPixelPercent();
+            // CalcPixelPercent();
             fx0 = fx;
         }
 
         if ( fy != fy0 )
         {
-            CalcPixelPercent();
+            // CalcPixelPercent();
             fy0 = fy;
         }
 
         if (mappingStrategy != mappingStrategy0)
         {
             mappingStrategy0 = mappingStrategy;
-            CalcPixelPercent();
+            // CalcPixelPercent();
         }
     }
 
@@ -240,10 +240,14 @@ public class RFR_SingleEye : MonoBehaviour
 
     void updateTextureSize()
     {
+        if(TexturePass1 != null)
+        {
+            TexturePass1.Release();
+        }
+        
         RenderTexture tempTexture = new RenderTexture(Mathf.RoundToInt(Screen.width / sigma0), Mathf.RoundToInt(Screen.height / sigma0), 24, RenderTextureFormat.Default);
         tempTexture.Create();
 
-        TexturePass1.Release();
         TexturePass1 = tempTexture;
     }
 
