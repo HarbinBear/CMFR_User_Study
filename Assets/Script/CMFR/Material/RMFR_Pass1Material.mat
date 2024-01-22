@@ -44,6 +44,6 @@ Material:
     - _iResolutionX: 1440
     - _iResolutionY: 1600
     - _kernel: 1
-    - _scaleRatio: 3
+    - _scaleRatio: 1.7
     m_Colors: []
   m_BuildTextureStacks: []
