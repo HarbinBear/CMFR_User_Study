@@ -276,29 +276,29 @@ public class RFR_SingleEye : MonoBehaviour
 
     }
 
-    public void CalcPixelPercent()
-    {
-        RenderTexture currentActiveRT = RenderTexture.active;
-        RenderTexture.active = TexturePass1;
-        Texture2D tex = new Texture2D(TexturePass1.width, TexturePass1.height);
-        tex.ReadPixels(new Rect(0,0,tex.width , tex.height) , 0,0);
-        Color[] colors = tex.GetPixels(0, 0, tex.width, tex.height);
-        int invalidCount = 0;
-        foreach (var color in colors)
-        {
-            if (color == Color.white)
-            {
-                invalidCount++;
-            }
-        }
-
-        int validCount = colors.Length - invalidCount;
-        float validPercent = (float)validCount / (float)colors.Length;
-        _validPercent = validPercent;
-        colors = null;
-        // UnityEngine.Object.Destroy(tex);
-        RenderTexture.active = currentActiveRT;
-    }
+    // public void CalcPixelPercent()
+    // {
+    //     RenderTexture currentActiveRT = RenderTexture.active;
+    //     RenderTexture.active = TexturePass1;
+    //     Texture2D tex = new Texture2D(TexturePass1.width, TexturePass1.height);
+    //     tex.ReadPixels(new Rect(0,0,tex.width , tex.height) , 0,0);
+    //     Color[] colors = tex.GetPixels(0, 0, tex.width, tex.height);
+    //     int invalidCount = 0;
+    //     foreach (var color in colors)
+    //     {
+    //         if (color == Color.white)
+    //         {
+    //             invalidCount++;
+    //         }
+    //     }
+    //
+    //     int validCount = colors.Length - invalidCount;
+    //     float validPercent = (float)validCount / (float)colors.Length;
+    //     _validPercent = validPercent;
+    //     colors = null;
+    //     // UnityEngine.Object.Destroy(tex);
+    //     RenderTexture.active = currentActiveRT;
+    // }
 
     public void SaveToFile(RenderTexture renderTexture, string name)
     {

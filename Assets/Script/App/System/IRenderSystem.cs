@@ -12,6 +12,8 @@ namespace Framework.CMFR
     {
         protected override void OnInit()
         {
+            
+            
         }
 
         

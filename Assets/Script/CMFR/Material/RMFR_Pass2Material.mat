@@ -8,7 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: RMFR_Pass2Material
-  m_Shader: {fileID: 4800000, guid: f9d8f844bfbb1b844a7c396b7bcb71e1, type: 3}
+  m_Shader: {fileID: 4800000, guid: 65c02561903f3ba419b8756f91c156ac, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []

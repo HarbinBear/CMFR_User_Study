@@ -1,4 +1,4 @@
-Shader "Custom/RMFR_Pass1"
+Shader "CMFR/CMFR_Pass"
 {
 	Properties
 	{
@@ -12,55 +12,76 @@ Shader "Custom/RMFR_Pass1"
 		_SquelchedGridMappingBeta("_SquelchedGridMappingBeta", float ) = 0.0
 		_MappingStrategy("_MappingStrategy" , int ) = 0
 	}
-		SubShader
+	SubShader
+	{
+		// No culling or depth
+		Cull Off ZWrite Off ZTest Always
+
+		Pass
 		{
-			// No culling or depth
-			Cull Off ZWrite Off ZTest Always
+			CGPROGRAM
+			#pragma vertex vert
+			#pragma fragment frag
 
-			Pass
+			#include "UnityCG.cginc"
+			// #include "Assets/Scripts/ToyRP/Shaders/globaluniform.cginc"
+
+
+			struct Complex
 			{
-				CGPROGRAM
-				#pragma vertex vert
-				#pragma fragment frag
+				float2 value;
+			};
+			
+			
+			struct appdata
+			{
+				float4 vertex : POSITION;
+				float2 uv : TEXCOORD0;
+			};
 
-				#include "UnityCG.cginc"
+			struct v2f
+			{
+				float2 uv : TEXCOORD0;
+				float4 vertex : SV_POSITION;
+			};
 
-				struct appdata
+			v2f vert(appdata v)
+			{
+				v2f o;
+				o.vertex = UnityObjectToClipPos(v.vertex);
+				o.uv = v.uv;
+				return o;
+			}
+
+			sampler2D _MainTex;
+			uniform float _iResolutionX;
+			uniform float _iResolutionY;
+			uniform float _eyeX;
+			uniform float _eyeY;
+			uniform float _scaleRatio;
+			uniform float _fx;
+			uniform float _fy;
+			uniform int _iApplyRFRMap1;
+			uniform float _SquelchedGridMappingBeta;
+			uniform int _MappingStrategy;
+			uniform int _DebugMode;
+			uniform int _OutputMode;
+
+			fixed4 frag(v2f i) : SV_Target
+			{
+				// return tex2D( _GT1 , i.uv );
+				// return tex2D( _MainTex , i.uv );
+				if( _OutputMode == 3 || _OutputMode == 4  ) 
 				{
-					float4 vertex : POSITION;
-					float2 uv : TEXCOORD0;
-				};
-
-				struct v2f
+					_DebugMode = 1 ;   // when show density
+				}
+				else
 				{
-					float2 uv : TEXCOORD0;
-					float4 vertex : SV_POSITION;
-				};
-
-				v2f vert(appdata v)
-				{
-					v2f o;
-					o.vertex = UnityObjectToClipPos(v.vertex);
-					o.uv = v.uv;
-					return o;
+					_DebugMode = 0 ; 
 				}
 
-				sampler2D _MainTex;
-				uniform float _iResolutionX;
-				uniform float _iResolutionY;
-				uniform float _eyeX;
-				uniform float _eyeY;
-				uniform float _scaleRatio;
-				uniform float _fx;
-				uniform float _fy;
-				uniform int _iApplyRFRMap1;
-				uniform float _SquelchedGridMappingBeta;
-				uniform int _MappingStrategy;
-
-				fixed4 frag(v2f i) : SV_Target
-				{
-					if (_iApplyRFRMap1 < 0.5)
-						return tex2D(_MainTex, i.uv);
+				if (_iApplyRFRMap1 < 0.5)
+					return tex2D(_MainTex, i.uv);
 
 				float2 cursorPos = float2(_eyeX, _eyeY); //(0,1)
 
@@ -103,186 +124,224 @@ Shader "Custom/RMFR_Pass1"
 				float2 pq = (float2(x, y)); //0,1 --> 0-1
 				fixed4 col = tex2D(_MainTex, pq);
 
-				if(_MappingStrategy == 0 )
+
+				float u,v;
+				x = ( x * 2 ) - 1 ;
+				y = ( y * 2 ) - 1 ;
+
+				_eyeX = ( _eyeX * 2 ) - 1 ;
+				_eyeY = ( _eyeY * 2 ) - 1 ;
+				
+				// --------- rect to square -----------
+				float signX, signY;
+				signX = x - _eyeX ;
+				signY = y - _eyeY ;
+				if( signX > 0 )
 				{
-					return col;
+					x = ( x - _eyeX ) / ( 1 - _eyeX );
+					// y = ( y - _eyeY ) / ( 1 - _eyeY );
+				}
+				else
+				{
+					x = ( x - _eyeX ) / ( _eyeX - (-1) );
+				}
+				
+				if( signY > 0 )
+				{
+					y = ( y - _eyeY ) / ( 1 - _eyeY );
+					// y = ( y - _eyeY ) / ( 1 - _eyeY );
+				}
+				else
+				{
+					y = ( y - _eyeY ) / ( _eyeY - (-1) );
+				}
+
+				
+				//
+
+				
+				float xx = pow( x , 2 );
+				float yy = pow( y , 2 );
+
+
+				// elliplical Grid mapping
+				// Spuare to Disc
+				if( _MappingStrategy == 1 )
+				{
+					u = x * sqrt( 1 - yy / 2 );
+					v = y * sqrt( 1 - xx / 2 );
+
+				}
+
+				//  Squelched Grid Open Mapping
+				if( _MappingStrategy == 2 )
+				{
+					float b = 1.0;
+					u = x * sqrt( ( 1 - b * yy ) / ( 1 - b * xx * yy ) );
+					v = y * sqrt( ( 1 - b * xx ) / ( 1 - b * xx * yy ) );
+					
+				}
+
+
+				// Blended E-Grid mapping
+				if ( _MappingStrategy == 3 )
+				{
+	
+					float beta = _SquelchedGridMappingBeta;
+					float a = beta + 1 - beta * xx;	
+					float b = beta + 1 - beta * yy;	
+					u = x * sqrt( ( yy * b - a*b ) / ( xx*yy - a*b ) );
+					v = y * sqrt( ( xx * b - a*b ) / ( xx*yy - a*b ) );
+						
+				}
+
+
+				// FG Squiricle Mapping
+				// Square to Disk
+				if( _MappingStrategy == 4 )
+				{
+					float var1 = sqrt( xx + yy - xx * yy );
+					float var2 = sqrt( xx + yy );
+					u = x * var1 / var2 ;
+					v = y * var1 / var2 ;
+				}
+
+
+				// 2-Squircular mapping
+				// Square to Disk
+				if( _MappingStrategy == 5 )
+				{
+					float var1 = sqrt( 1 + xx * yy );
+					u = x / var1 ;
+					v = y / var1 ;
+				}
+
+				// schwarz-christoffel
+				// Square to Disk
+				if( _MappingStrategy == 7 )
+				{
 					
 				}
 				
 
-				// ---------------------------------------------------------------------------------------------
-
-				// [0,1] -> [-1,1] 
-				x = x * 2.0 - 1.0;
-				y = y * 2.0 - 1.0;
-					
-				float xx = pow(x,2);
-				float yy = pow(y,2);
-				float u,v;
-					
-				// ---------------------------------------------------------------------------------------------
-
-				if( _MappingStrategy == 1 )
-				{
-					
-//					Elliptical Grid Mapping
-//					Disc to Square Mapping
-
-					if(2 + xx - yy + 2 * sqrt(2) * x < 0 ) return fixed4(0,1,0,1);
-					if(2 + xx - yy - 2 * sqrt(2) * x < 0 ) return fixed4(0,1,0,1);
-					if(2 - xx + yy + 2 * sqrt(2) * y < 0 ) return fixed4(0,1,0,1);
-					if(2 - xx + yy - 2 * sqrt(2) * y < 0 ) return fixed4(0,1,0,1);
-						
-					u = 0.5 * sqrt( 2 + xx - yy + 2 * sqrt(2) * x ) - 0.5 * sqrt( 2 + xx - yy - 2 * sqrt(2) * x );
-					v = 0.5 * sqrt( 2 - xx + yy + 2 * sqrt(2) * y ) - 0.5 * sqrt( 2 - xx + yy - 2 * sqrt(2) * y ) ;
-											
-				}
-
-					
-				// ---------------------------------------------------------------------------------------------
-
-
-				if( _MappingStrategy == 4 )
-				{
-					// FG-Spuircular Mapping with & without S and K
-					// Disc to Square Mapping
-
-					float S = 1.0f;
-					float SS = S * S;
-					if( x == 0 || y == 0 ) discard;
-						
-					float temp = ( xx + yy ) * ( xx + yy - 4 * SS * xx * yy ) ;   // float temp = ( xx + yy ) * ( xx + yy - 4 * SS * xx * yy / ( xx + yy )) ;
-					if( temp < 0 ) return fixed4(0,1,0,1);
-					temp = sqrt( temp );
-					temp = xx + yy - temp ;
-					if( temp < 0 ) return fixed4(0,1,0,1);
-					temp = sqrt( temp );
-					temp = sign( x * y ) / S / sqrt(2) * temp ;     // temp = sign( x * y ) / S / sqrt(2) * temp * sqrt( xx + yy ) ;
-						
-					u = temp / y;
-					v = temp / x;
-					
-				}
-
-
-				// ---------------------------------------------------------------------------------------------
-
-					
-				// cornerific tapered2 mapping
-				// Disc to Square
-					
-				// float var0 = xx + yy ;
-				// float var1 = 2 - var0 ;
-				// float var2 = 4 * xx * yy * var1;
-				// var2 = var0 - var2 ;
-				// var2 = var0 * var2 ;
-				// var2 = sqrt(var2) ;
-				// var2 = var0 - var2 ;
-				// var2 /= 2 * var1 ;
-				// var2 = sqrt(var2) ;
-				// var2 *= sign( x * y );
-				//
-				// u = var2 / y;
-				// v = var2 / x;
-				//
-
-
-
-				// ---------------------------------------------------------------------------------------------
-
-				// Non-axial 2-pinch mapping
-				// Disc to Square
-					
-				// float var0 = xx + yy ;
-				// float var1 = var0 - 4*xx*yy;
-				// var1 *= var0;
-				// var1 = pow( var1 , 0.5 );
-				// var1 = var0 - 2 * xx * yy - var1;
-				// var1 = pow( var1 , 0.25 );
-				// var1 *= sign( x * y ) / (  pow( 2 , 0.25 ) );
-				//
-				// u = var1 / y ;
-				// v = var1 / x ;
-
-
-
-				// ---------------------------------------------------------------------------------------------
-				if(_MappingStrategy == 2 )
-				{
-// Squelched Grid Open Mapping
-// Disc to Square
-					//
-					u = x / sqrt( 1- yy ) ;
-					v = y / sqrt( 1- xx ) ;
-
-					
-				}
-
-					
-					
-				// ---------------------------------------------------------------------------------------------
-
-				if( _MappingStrategy == 3 )
-				{
-// Blended E-Grid mapping
-
-					float beta = _SquelchedGridMappingBeta;
-					float ax = beta + 1 + beta*xx - yy ;
-					float ay = beta + 1 + beta*yy - xx ;
-					float c = 4 * beta * ( beta + 1 ) ;
-					u = sign( x ) / sqrt( 2 * beta ) * sqrt( ax - sqrt( ax*ax - c*xx )); 
-					v = sign( y ) / sqrt( 2 * beta ) * sqrt( ay - sqrt( ay*ay - c*yy )); 
-						
-				}
-
-
+				// hyperbolic
+				// Spuare to Disk
 				if( _MappingStrategy == 8 )
 				{
-					// hyperbolic
-					float a = 0.5;
+					float a = 0.8;
 					float aa = a * a;
-
 					float bb = aa  / ( 1 - aa );
 					if( abs(x) > abs(y) )
 					{
-						u = sign(x) * sqrt( xx/aa - yy/bb );
+						u = sign(x) * sqrt( aa*xx + aa/bb*yy );
 						v = y;
 					}
 					if( abs(y) >= abs(x) )
 					{
-						v = sign(y) * sqrt( yy/aa - xx/bb );
+						v = sign(y) * sqrt( aa*yy + aa/bb*xx );
 						u = x;
 					}
 				}
 
 
+				// Simple Strech
+				// square to disk
+				if(_MappingStrategy == 11 )
+				{
+					if( xx >= yy )
+					{
+						u = sign(x) * xx    / ( sqrt( xx + yy ));
+						v = sign(x) * x * y / ( sqrt( xx + yy ));
+					}
+					else
+					{
+						u = sign(y) * x * y / ( sqrt( xx + yy ));
+						v = sign(y) * yy    / ( sqrt( xx + yy ));
+					}
+				}
 
-					
-					
-				// ---------------------------------------------------------------------------------------------
 
-				// 	[-1,1] -> [0,1]
-				float2 uv = float2(u,v);
-				uv = ( uv + 1.0 ) / 2.0 ;
+				// 属于圆盘映射部分，应放在矩形-正方形映射里面。
+				if( _MappingStrategy > 0 )
+				{
+					u *= sqrt(2);
+					v *= sqrt(2);
+				}
 
-				if( uv.x < 0.0 || uv.x > 1.0 ){ return fixed4(1,0,0,1); }	
-				if( uv.y < 0.0 || uv.y > 1.0 ){ return fixed4(1,0,0,1); }
+				// ------- square to rect --------
+				if( signX > 0 )
+				{
+					u = ( 1 - _eyeX ) * u + _eyeX ;
+				}
+				else
+				{
+					u = ( _eyeX - (-1) ) * u + _eyeX ;
+				}
+
+				if( signY > 0 )
+				{
+					v = ( 1 - _eyeY ) * v + _eyeY ;
+				}
+				else
+				{
+					v = ( _eyeY - (-1) ) * v + _eyeY ;
+				}
+				//
 				
-				// ---------------------------------------------------------------------------------------------
+				u = ( u + 1 ) / 2 ;
+				v = ( v + 1 ) / 2 ;
 
-				col = tex2D(_MainTex, uv);
 
-				// return fixed4( uv.x , uv.y , 0 , 1);
+				if( _DebugMode == 0 )
+				{
 
-				// uv = float2( i.uv.x , i.uv.y);				
-
-				// fixed4 col = tex2D(_MainTex, uv);
-
-				fixed4 col2 = float4( uv.x , uv.y , 0 , 1.0 );
-
-				
+					if( u < 0.0 || u > 1.0 ){ return fixed4(0,0,0,0); }	
+					if( v < 0.0 || v > 1.0 ){ return fixed4(0,0,0,0); }
 					
+					u = max( 0 , u );
+					u = min( 1 , u );
+					v = max( 0 , v );
+					v = min( 1 , v );
+				}
+				else if( _DebugMode == 1 )
+				{
+					if( u < 0.0 || u > 1.0 ){ return fixed4(1,1,1,1); }	
+					if( v < 0.0 || v > 1.0 ){ return fixed4(1,1,1,1); }
+					
+				}
+
+					
+				if( _DebugMode == 0 )
+				{
+					if( _MappingStrategy > 0 )
+					{
+						return tex2D(_MainTex, fixed2( u , v ) );
+					}
+					else if (_MappingStrategy == 0 )
+					{
+						return col;
+					}
+				}
+				else if( _DebugMode == 1 )
+				{
+					if( _MappingStrategy > 0 )
+					{
+						return fixed4( u , v , 0 , 1 );
+					}
+					else if( _MappingStrategy == 0 )
+					{
+						return fixed4( pq , 0 , 1 );
+					}
+				}
+
 				return col;
+
+
+
+
+
+				
+			
 			}
 			ENDCG
 		}

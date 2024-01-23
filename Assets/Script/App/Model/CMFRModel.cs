@@ -1,4 +1,6 @@
-﻿namespace Framework.CMFR
+﻿using UnityEngine;
+
+namespace Framework.CMFR
 {
     
     public enum OutputMode
@@ -40,8 +42,8 @@
         BindableProperty<bool> Bokeh_On { get;  }
         BindableProperty<bool> FrustumJitter_On { get;  }
 
-        
-        
+        BindableProperty<RenderTexture> TexPass0 { get; }
+
     }
 
 
@@ -123,7 +125,12 @@
         {
             Value = false
         };
-        
+
+        public BindableProperty<RenderTexture> TexPass0 { get; } = new BindableProperty<RenderTexture>()
+        {
+
+        };
+
         protected override void OnInit()
         {
 

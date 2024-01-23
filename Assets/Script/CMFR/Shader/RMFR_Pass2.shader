@@ -1,10 +1,10 @@
-Shader "Custom/RMFR_Pass2"
+Shader "CMFR/Inv_CMFR_Pass"
 {
 	Properties
 	{
 		_MainTex("Texture", 2D) = "white" {}
 		_MidTex("Texture", 2D) = "white" {}
-		_NoiseTex("Texture", 2D) = "white" {}
+		_NoiseTex("_NoiseTex" , 2D) = "white" {}
 		_eyeX("_eyeX", float) = 0.5
 		_eyeY("_eyeY", float) = 0.5
 		_scaleRatio("_scaleRatio", float) = 2.0
@@ -14,7 +14,9 @@ Shader "Custom/RMFR_Pass2"
 		_SquelchedGridMappingBeta("_SquelchedGridMappingBeta", float ) = 0.0
 		_MappingStrategy("_MappingStrategy" , int ) = 0
 		
-		_bSampleDensityWithNoise("_bSampleDensityWithNoise" , int ) = 0
+		_bSampleDensityWithNoise("_bSampleDensityWithNoise" , float ) = 0
+		_DebugMode("_DebugMode", int ) = 0
+		_validPercent("_validPercent" , float ) = 0.78 
 
 	}
 	SubShader
@@ -51,6 +53,7 @@ Shader "Custom/RMFR_Pass2"
 			}
 			sampler2D _MainTex;
 			sampler2D _MidTex;
+			sampler2D _NoiseTex;
 			uniform float _eyeX;
 			uniform float _eyeY;
 			uniform float _scaleRatio;
@@ -60,88 +63,258 @@ Shader "Custom/RMFR_Pass2"
 			uniform int _iApplyRFRMap2;
 			uniform float _SquelchedGridMappingBeta;
 			uniform int _MappingStrategy;
-			uniform int _bSampleDensityWithNoise;
+			uniform float _bSampleDensityWithNoise;
+			uniform int _DebugMode;
+			uniform int _OutputMode;
+			uniform float _validPercent;
 
 			fixed4 frag(v2f i) : SV_Target
 			{
+
+				if( _OutputMode == 3 || _OutputMode == 4  )
+				{
+					_DebugMode = 1 ;
+				}
+				else
+				{
+					_DebugMode = 0 ; 
+				}
+				
 				if (_iApplyRFRMap2 < 0.5)
 					return tex2D(_MidTex, i.uv);
 
 				float2 cursorPos = float2(_eyeX, _eyeY); //0-1 -> -1,1 (0,0)
 				float2 tc = (i.uv - cursorPos);
+				
 
-				// ------------------------------------------------------
+
+				float u,v;
 				float2 tt = tc;
+
 				tt = tt * 2 ;      //  [ -1 , 1 ]
+
+				
+				_eyeX = ( _eyeX * 2 ) - 1 ;
+				_eyeY = ( _eyeY * 2 ) - 1 ;
+				
+				// --------- rect to square -----------
+				if( tt.x > 0   )
+				{
+					tt.x = ( tt.x ) / ( 1 - _eyeX );
+				}
+				else
+				{
+					tt.x = ( tt.x ) / ( _eyeX - ( -1 ) );
+				}
+
+				if( tt.y > 0   )
+				{
+					tt.y = ( tt.y ) / ( 1 - _eyeY );
+				}
+				else
+				{
+					tt.y = ( tt.y ) / ( _eyeY - ( -1 ) );
+				}
+				
+
+				// 属于圆盘映射部分，应放在矩形-正方形映射里面。
+				tt /= sqrt(2);
+				
 				float xx = pow( tt.x , 2 );
 				float yy = pow( tt.y , 2 );
 
-				if( _MappingStrategy == 2 )
+
+
+				
+				// elliptical Grid Mapping
+				// Disc to Square
+				if( _MappingStrategy == 1 )
 				{
-	//  Squelched Grid Open Mapping
-	
-					float b = 1.0;
-					tc.x = tt.x * sqrt( ( 1 - b * yy ) / ( 1 - b * xx * yy ) );
-					tc.y = tt.y * sqrt( ( 1 - b * xx ) / ( 1 - b * xx * yy ) );
+					if(2 + xx - yy + 2 * sqrt(2) * tt.x < 0 ) return fixed4(0,1,0,1);
+					if(2 + xx - yy - 2 * sqrt(2) * tt.x < 0 ) return fixed4(0,1,0,1);
+					if(2 - xx + yy + 2 * sqrt(2) * tt.y < 0 ) return fixed4(0,1,0,1);
+					if(2 - xx + yy - 2 * sqrt(2) * tt.y < 0 ) return fixed4(0,1,0,1);
+						
+					u = 0.5 * sqrt( 2 + xx - yy + 2 * sqrt(2) * tt.x ) - 0.5 * sqrt( 2 + xx - yy - 2 * sqrt(2) * tt.x ) ;
+					v = 0.5 * sqrt( 2 - xx + yy + 2 * sqrt(2) * tt.y ) - 0.5 * sqrt( 2 - xx + yy - 2 * sqrt(2) * tt.y ) ;
 					
 				}
-	
-				if(_MappingStrategy == 1 )
+
+				// Squelched Grid Open Mapping
+				// Disc to Square
+				if(_MappingStrategy == 2 )
 				{
-	//
-	// Elliptical Grid Mapping
-	// Square to Disc Mapping
-	
-					tc.x = tt.x * sqrt( 1 - yy / 2 );
-					tc.y = tt.y * sqrt( 1 - xx / 2 );
-					
+					u = tt.x / sqrt( 1- yy ) ;
+					v = tt.y / sqrt( 1- xx ) ;
 				}
-	
-	
-				if ( _MappingStrategy == 3 )
+
+
+				// Blended E-Grid mapping
+				if( _MappingStrategy == 3 )
 				{
-	// Blended E-Grid mapping
-	
+
 					float beta = _SquelchedGridMappingBeta;
-					float a = beta + 1 - beta * xx;	
-					float b = beta + 1 - beta * yy;	
-					tc.x = tt.x * sqrt( ( yy * b - a*b ) / ( xx*yy - a*b ) );
-					tc.y = tt.y * sqrt( ( xx * b - a*b ) / ( xx*yy - a*b ) );
+					float ax = beta + 1 + beta*xx - yy ;
+					float ay = beta + 1 + beta*yy - xx ;
+					float c = 4 * beta * ( beta + 1 ) ;
+					u = sign( tt.x ) / sqrt( 2 * beta ) * sqrt( ax - sqrt( ax*ax - c*xx )); 
+					v = sign( tt.y ) / sqrt( 2 * beta ) * sqrt( ay - sqrt( ay*ay - c*yy )); 
 						
 				}
 
 
+				// FG-Spuircular Mapping with & without S and K
+				// Disc to Square Mapping
+				if( _MappingStrategy == 4 )
+				{
 
+					float S = 1.0f;
+					float SS = S * S;
+					if( tt.x == 0 || tt.y == 0 ) discard;
+						
+					float temp = ( xx + yy ) * ( xx + yy - 4 * SS * xx * yy ) ;   // float temp = ( xx + yy ) * ( xx + yy - 4 * SS * xx * yy / ( xx + yy )) ;
+					if( temp < 0 ) return fixed4(0,0,0,1);
+					temp = sqrt( temp );
+					temp = xx + yy - temp ;
+					if( temp < 0 ) return fixed4(0,0,0,1);
+					temp = sqrt( temp );
+					temp = sign( tt.x * tt.y ) / S / sqrt(2) * temp ;     // temp = sign( x * y ) / S / sqrt(2) * temp * sqrt( xx + yy ) ;
+						
+					u = temp / tt.y;
+					v = temp / tt.x;
+					
+				}
+
+
+				// 2-Squircular mapping
+				// Disc to Square mapping
+				if( _MappingStrategy == 5 )
+				{
+					float var1 = sqrt( 1 - sqrt( 1 - 4 * xx * yy ) );
+					var1 = var1 * sign( tt.x * tt.y ) / ( sqrt(2) );
+					u = var1 / tt.y ;
+					v = var1 / tt.x ;
+				}
+
+				// schwarz-christoffel
+				// Disc to Square
+				if( _MappingStrategy == 7 )
+				{
+					
+				}
+				
+
+				// hyperbolic
+				// Disc to Square
 				if( _MappingStrategy == 8 )
 				{
-					// hyperbolic
-					float a = 0.8;
+					float a = 0.5;
 					float aa = a * a;
+
 					float bb = aa  / ( 1 - aa );
 					if( abs(tt.x) > abs(tt.y) )
 					{
-						tc.x = sign(tt.x) * sqrt( aa*xx + aa/bb*yy );
-						tc.y = tt.y;
+						u = sign(tt.x) * sqrt( xx/aa - yy/bb );
+						v = tt.y;
 					}
 					if( abs(tt.y) >= abs(tt.x) )
 					{
-						tc.y = sign(tt.y) * sqrt( aa*yy + aa/bb*xx );
-						tc.x = tt.x;
+						v = sign(tt.y) * sqrt( yy/aa - xx/bb );
+						u = tt.x;
 					}
 				}
 
-
+				
+				// cornerific tapered2 mapping
+				// Disc to Square
+				if( _MappingStrategy == 9 )
+				{					
+					float var0 = xx + yy ;
+					float var1 = 2 - var0 ;
+					float var2 = 4 * xx * yy * var1;
+					var2 = var0 - var2 ;
+					var2 = var0 * var2 ;
+					var2 = sqrt(var2) ;
+					var2 = var0 - var2 ;
+					var2 /= 2 * var1 ;
+					var2 = sqrt(var2) ;
+					var2 *= sign( tt.x * tt.y );
+					
+					u = var2 / tt.y;
+					v = var2 / tt.x;
+				}
 
 				
-	
-				if( _MappingStrategy != 0 )
+				// Non-axial 2-pinch mapping
+				// Disc to Square
+				if( _MappingStrategy == 10 )
 				{
 					
-					tc = ( tc ) / 2 ;    //  [ -0.5 , 0.5 ]
+					float var0 = xx + yy ;
+					float var1 = var0 - 4*xx*yy;
+					var1 *= var0;
+					var1 = pow( var1 , 0.5 );
+					var1 = var0 - 2 * xx * yy - var1;
+					var1 = pow( var1 , 0.25 );
+					var1 *= sign( tt.x * tt.y ) / (  pow( 2 , 0.25 ) );
+					
+					u = var1 / tt.y ;
+					v = var1 / tt.x ;
+				}
+
+				// Simple Strech
+				// Disk To Square
+				if( _MappingStrategy == 11  )
+				{
+					float var = sqrt( xx + yy );
+					if( xx > yy )
+					{
+						u = sign( tt.x ) * var;
+						v = sign( tt.x ) * var * tt.y / tt.x;
+					}
+					else
+					{
+						u = sign( tt.y ) * var * tt.x / tt.y;
+						v = sign( tt.y ) * var;
+					}
+				} 
+
+				// ------- square to rect --------
+				if( tt.x > 0 )
+				{
+					u = ( 1 - _eyeX ) * u ;
+				}
+				else
+				{
+					u = ( _eyeX - ( -1 ) ) * u ;
+				}
+
+				if( tt.y > 0 )
+				{
+					v = ( 1 - _eyeY ) * v  ;
+				}
+				else
+				{
+					v = ( _eyeY - ( -1 ) ) * v  ;
 				}
 				
-				// -------------- -------------------------------------------
+
 					
+				// --------------------------
+				
+				if( _MappingStrategy > 0 )
+				{
+					u/=2;
+					v/=2;
+
+					tc = fixed2(u,v);  //  [ -0.5 , 0.5 ]
+				}
+
+				// --------------------------
+
+
+
+
 				float maxDxPos = 1.0 - cursorPos.x; // >= 0.5
 				float maxDyPos = 1.0 - cursorPos.y;
 				float maxDxNeg = cursorPos.x;
@@ -176,77 +349,88 @@ Shader "Custom/RMFR_Pass2"
 					y = y / norDyNeg;
 					pq.y = y * maxDyNeg + cursorPos.y;
 				}
+				
+
 				fixed4 col = tex2D(_MidTex, pq);
-				// return fixed4( pq , 0 ,1);
 
 
-				// ------------------------------------------------------------
-				//
-				// pq.x = pq.x * 2.0 - 1.0;
-				// pq.y = pq.y * 2.0 - 1.0;
-				//
-				// tc = pq;
-				// pq.x = tc.x * sqrt( ( 1 - pow( tc.y , 2 ) ) / ( 1 - pow( tc.x , 2 ) * pow( tc.y , 2 ) ) );
-				// pq.y = tc.y * sqrt( ( 1 - pow( tc.x , 2 ) ) / ( 1 - pow( tc.x , 2 ) * pow( tc.y , 2 ) ) );
-				//
-				// pq = (pq + 1) / 2 ;
-				//
-				// return tex2D( _MidTex , pq ) ;
-
-				// ------------------------------------------------------------
-
-				// float u = pq.x / sqrt( 1- pow( pq.y , 2) ) ;
-				// float v = pq.y / sqrt( 1- pow( pq.x , 2) ) ;
-				//
-				//
-				// return tex2D(_MidTex, fixed2(u,v));
-
+				if( _DebugMode == 1 )
+				{
 					
-//				// ------------------------------------------------------------
-
-				float res = 800 / _scaleRatio ;
-				float OriginRes = 800;
+					float res = 800 / _scaleRatio ;
+					float OriginRes = 800;
 				
 				
 				
-				pq *= res ;  // pos of RectMapping Tex   [ 0 , 800 / Scale ]   // pq = fixed2( col.x ,col.y );        /// value( pos in Original Tex ) in the RectMappingTex, not the pos of it.
+					pq *= res ;  // pos of RectMapping Tex   [ 0 , 800 / Scale ]   // pq = fixed2( col.x ,col.y );        /// value( pos in Original Tex ) in the RectMappingTex, not the pos of it.
 				   
-				fixed2 point1 = fixed2( floor(pq.x) / res , floor(pq.y) / res ) + frac(sin( x + y )*10000.0) * 0.01 * _bSampleDensityWithNoise  ;
-				fixed2 point3 = fixed2( ceil(pq.x)  / res , floor(pq.y) / res ) + frac(sin( x + y )*10000.0) * 0.01 * _bSampleDensityWithNoise  ;    
-				fixed2 point2 = fixed2( ceil(pq.x)  / res , ceil(pq.y)  / res ) + frac(sin( x + y )*10000.0) * 0.01 * _bSampleDensityWithNoise   ;
-				fixed2 point4 = fixed2( floor(pq.x) / res , ceil(pq.y)  / res ) + frac(sin( x + y )*10000.0) * 0.01 * _bSampleDensityWithNoise  ;
-				
-				if( point1.x < 0 || point1.x > 1 || point1.y < 0 || point1.y > 1 ) return fixed4(0,0,0,1);
-				if( point2.x < 0 || point2.x > 1 || point2.y < 0 || point2.y > 1 ) return fixed4(0,0,0,1);
-				if( point3.x < 0 || point3.x > 1 || point3.y < 0 || point3.y > 1 ) return fixed4(0,0,0,1);
-				if( point4.x < 0 || point4.x > 1 || point4.y < 0 || point4.y > 1 ) return fixed4(0,0,0,1);
-				
-				point1 = tex2D( _MidTex, point1 ).xy ;
-				point2 = tex2D( _MidTex, point2 ).xy ;
-				point3 = tex2D( _MidTex, point3 ).xy ;
-				point4 = tex2D( _MidTex, point4 ).xy ;
-				
-				point1 *= OriginRes ;
-				point2 *= OriginRes ;
-				point3 *= OriginRes ;
-				point4 *= OriginRes ;
-				
-				float s1 = 0.5 * ( point1.x * point2.y - point1.y * point2.x + point2.x * point3.y - point2.y * point3.x + point3.x * point1.y - point3.y * point1.x);
-				float s2 = 0.5 * ( point1.x * point2.y - point1.y * point2.x + point2.x * point4.y - point2.y * point4.x + point4.x * point1.y - point4.y * point1.x);
-				
-				float density = 1 / ( abs(s1) + abs(s2) );
-				return fixed4( density ,density,density ,1);
-				
-				
-				
-				
+					// fixed2 pt1 = fixed2( floor(pq.x) / res , floor(pq.y) / res ) ;
+					// fixed2 pt3 = fixed2( ceil(pq.x)  / res , floor(pq.y) / res ) ;   
+					// fixed2 pt2 = fixed2( ceil(pq.x)  / res , ceil(pq.y)  / res ) ;
+					// fixed2 pt4 = fixed2( floor(pq.x) / res , ceil(pq.y)  / res ) ;
+					//
+					//
 
+					if( (pq.x - 0.5) / res < 0 || (pq.x + 0.5) / res > 1 ) discard;
+					if( (pq.y - 0.5) / res < 0 || (pq.y + 0.5) / res > 1 ) discard;
+
+					fixed2 pt1 = fixed2( (pq.x - 0.5) / res ,  (pq.y - 0.5) / res ) ;
+					fixed2 pt3 = fixed2( (pq.x + 0.5)  / res , (pq.y - 0.5) / res ) ;   
+					fixed2 pt2 = fixed2( (pq.x + 0.5)  / res , (pq.y + 0.5)  / res ) ;
+					fixed2 pt4 = fixed2( (pq.x - 0.5) / res ,  (pq.y + 0.5)  / res ) ;
 
 					
+
 					
+					//
+					pt1 += ( tex2D( _NoiseTex , fixed2(x,y)).x - 0.5 ) * 0.01 * ( _bSampleDensityWithNoise ) ; 
+					pt2 += ( tex2D( _NoiseTex , fixed2(x,y)).x - 0.5 ) * 0.01 * ( _bSampleDensityWithNoise ) ; 
+					pt3 += ( tex2D( _NoiseTex , fixed2(x,y)).x - 0.5 ) * 0.01 * ( _bSampleDensityWithNoise ) ; 
+					pt4 += ( tex2D( _NoiseTex , fixed2(x,y)).x - 0.5 ) * 0.01 * ( _bSampleDensityWithNoise ) ; 
+
+					
+					if( pt1.x < 0 || pt1.x > 1 || pt1.y < 0 || pt1.y > 1 ) return fixed4(0,0,0,1);
+					if( pt2.x < 0 || pt2.x > 1 || pt2.y < 0 || pt2.y > 1 ) return fixed4(0,0,0,1);
+					if( pt3.x < 0 || pt3.x > 1 || pt3.y < 0 || pt3.y > 1 ) return fixed4(0,0,0,1);
+					if( pt4.x < 0 || pt4.x > 1 || pt4.y < 0 || pt4.y > 1 ) return fixed4(0,0,0,1);
+					
+					pt1 = tex2D( _MidTex, pt1 ).xy ;
+					pt2 = tex2D( _MidTex, pt2 ).xy ;
+					pt3 = tex2D( _MidTex, pt3 ).xy ;
+					pt4 = tex2D( _MidTex, pt4 ).xy ;
+				
+				
+					if( pt1.x < 0 || pt1.x > 1 || pt1.y < 0 || pt1.y > 1 ) return fixed4(0,0,0,1);
+					if( pt2.x < 0 || pt2.x > 1 || pt2.y < 0 || pt2.y > 1 ) return fixed4(0,0,0,1);
+					if( pt3.x < 0 || pt3.x > 1 || pt3.y < 0 || pt3.y > 1 ) return fixed4(0,0,0,1);
+					if( pt4.x < 0 || pt4.x > 1 || pt4.y < 0 || pt4.y > 1 ) return fixed4(0,0,0,1);
+				
+					pt1 *= OriginRes ;
+					pt2 *= OriginRes ;
+					pt3 *= OriginRes ;
+					pt4 *= OriginRes ;
+				
+					float s1 = 0.5 * ( pt1.x * pt2.y - pt1.y * pt2.x + pt2.x * pt3.y - pt2.y * pt3.x + pt3.x * pt1.y - pt3.y * pt1.x);
+					float s2 = 0.5 * ( pt1.x * pt2.y - pt1.y * pt2.x + pt2.x * pt4.y - pt2.y * pt4.x + pt4.x * pt1.y - pt4.y * pt1.x);
+
+					float density;
+					if( _MappingStrategy > 0 )
+					{
+						density = 1 / ( ( abs(s1) + abs(s2) ) * _validPercent );
+						
+					}
+					else if (_MappingStrategy == 0 )
+					{
+						density = 1 / ( ( abs(s1) + abs(s2) )  );
+						
+					}
+					return fixed4( density ,density,density ,1);
+				}
+
+				// return fixed4(0,1,0,1);
 				return col;
 			}
-			ENDCG
+		ENDCG
 		}
 	}
 }
