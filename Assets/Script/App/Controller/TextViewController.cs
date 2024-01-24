@@ -17,6 +17,7 @@ namespace Framework.CMFR
             
             ICMFRModel model = CMFRDemo.Interface.GetModel<ICMFRModel>();
             
+            model.bOriginal.Register(BindablePropertyUpdateText);
             model.sigma.Register(BindablePropertyUpdateText);
             model.fx.Register(BindablePropertyUpdateText);
             model.fy.Register(BindablePropertyUpdateText);
@@ -59,6 +60,7 @@ namespace Framework.CMFR
         public void UpdateText()
         {
             textComp.text = "";
+            MakeLineFromModel("bOriginal");
             MakeLineFromModel("sigma");
             MakeLineFromModel("fx");
             MakeLineFromModel("fy");
@@ -73,6 +75,7 @@ namespace Framework.CMFR
         {
             ICMFRModel model = CMFRDemo.Interface.GetModel<ICMFRModel>();
             
+            model.bOriginal.UnRegister(BindablePropertyUpdateText);
             model.sigma.UnRegister(BindablePropertyUpdateText);
             model.fx.UnRegister(BindablePropertyUpdateText);
             model.fy.UnRegister(BindablePropertyUpdateText);

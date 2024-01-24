@@ -22,6 +22,7 @@ namespace Framework.CMFR
     
     public interface ICMFRModel : IModel
     {
+        BindableProperty<bool> bOriginal { get;  }
         BindableProperty<float> sigma { get;  }
         BindableProperty<float> fx { get;  }
         BindableProperty<float> fy { get;  }
@@ -49,7 +50,10 @@ namespace Framework.CMFR
 
     public class CMFRModel : AbstractModel, ICMFRModel
     {
-        
+        public BindableProperty<bool> bOriginal { get; } = new BindableProperty<bool>()
+        {
+            Value = false
+        };
         public BindableProperty<float> sigma { get; } = new BindableProperty<float>()
         {
             Value = 2.2f

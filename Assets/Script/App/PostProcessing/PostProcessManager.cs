@@ -11,6 +11,8 @@ namespace Framework.CMFR
 
         public RenderTexture texPass0;
 
+        public bool _original;
+        
         [Range(1,3)]
         public float _sigma;
         
@@ -66,6 +68,7 @@ namespace Framework.CMFR
             
             ICMFRModel model = CMFRDemo.Interface.GetModel<ICMFRModel>();
 
+            model.bOriginal.Register(OnModelChanged);
             model.sigma.Register(OnModelChanged);
             model.fx.Register(OnModelChanged);
             model.fy.Register(OnModelChanged);
@@ -127,6 +130,7 @@ namespace Framework.CMFR
             ICMFRModel model = CMFRDemo.Interface.GetModel<ICMFRModel>();
             
             // model -> view
+            _original = model.bOriginal.Value;
             _sigma = model.sigma.Value;
             _fx = model.fx.Value;
             _fy = model.fy.Value;
@@ -163,6 +167,7 @@ namespace Framework.CMFR
 
             if (_sigma == 0) return;
             
+            model.bOriginal.Value = _original;
             model.sigma.Value = _sigma;
             model.fx.Value = _fx;
             model.fy.Value = _fy;
@@ -182,6 +187,7 @@ namespace Framework.CMFR
         {
             ICMFRModel model = CMFRDemo.Interface.GetModel<ICMFRModel>();
 
+            _original = model.bOriginal.Value;
             _sigma = model.sigma.Value;
             _fx = model.fx.Value;
             _fy = model.fy.Value;

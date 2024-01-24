@@ -54,8 +54,17 @@ namespace Framework.CMFR
 
         public void RenderEffect(RenderTexture source, RenderTexture destination)
         {
-            CMFRPass( source  );
-            InvCMFRPass( destination  );
+            ICMFRModel model = CMFRDemo.Interface.GetModel<ICMFRModel>();
+            if (model.bOriginal == true)
+            {
+                Graphics.Blit( model.TexPass0 , destination );
+            }
+            else
+            {
+                CMFRPass();
+                InvCMFRPass( destination  );
+
+            }
         }
 
         public void OnDestroy()
@@ -63,7 +72,7 @@ namespace Framework.CMFR
             
         }
 
-        void CMFRPass(RenderTexture source)
+        void CMFRPass( RenderTexture source = null )
         {
             ICMFRModel model = CMFRDemo.Interface.GetModel<ICMFRModel>();
             if (MatPass1 == null)
