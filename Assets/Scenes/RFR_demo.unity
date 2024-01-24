@@ -134,7 +134,6 @@ GameObject:
   - component: {fileID: 49224372}
   - component: {fileID: 49224376}
   - component: {fileID: 49224375}
-  - component: {fileID: 49224374}
   - component: {fileID: 49224373}
   m_Layer: 0
   m_Name: Main Camera
@@ -201,33 +200,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &49224374
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 49224371}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8efbaa73599752240b23f9aa5edee914, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TexturePass0: {fileID: 8400000, guid: fd738ba93abf3f9488660d01c6486d40, type: 2}
-  Pass1Material: {fileID: 2100000, guid: 48a9e02c328413f4f9e0855bca0e2773, type: 2}
-  Pass2Material: {fileID: 2100000, guid: 6c73d523034daaa4495a1685dd682eb9, type: 2}
-  DenoiseMaterial: {fileID: 2100000, guid: e22c161034b79fb4bb8d55209612a7e1, type: 2}
-  sigma: 3
-  fx: 0.231
-  fy: 0.224
-  eyeX: 0.5
-  eyeY: 0.5
-  SquelchedGridMappingBeta: 0.09
-  SampleDensityWithNoise: 0.495
-  mappingStrategy: 0
-  debugMode: 0
-  outputTex: 2
-  savePath: 
 --- !u!114 &49224375
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3126,7 +3098,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1480478201}
-  - component: {fileID: 1480478200}
   - component: {fileID: 1480478199}
   - component: {fileID: 1480478202}
   m_Layer: 0
@@ -3179,33 +3150,6 @@ Camera:
   m_OcclusionCulling: 1
   m_StereoConvergence: 10
   m_StereoSeparation: 0.022
---- !u!114 &1480478200
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1480478198}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8efbaa73599752240b23f9aa5edee914, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  TexturePass0: {fileID: 8400000, guid: fd738ba93abf3f9488660d01c6486d40, type: 2}
-  Pass1Material: {fileID: 2100000, guid: 48a9e02c328413f4f9e0855bca0e2773, type: 2}
-  Pass2Material: {fileID: 2100000, guid: 6c73d523034daaa4495a1685dd682eb9, type: 2}
-  DenoiseMaterial: {fileID: 2100000, guid: e22c161034b79fb4bb8d55209612a7e1, type: 2}
-  sigma: 1.7
-  fx: 0.196
-  fy: 0.206
-  eyeX: 0.5
-  eyeY: 0.5
-  SquelchedGridMappingBeta: 0.09
-  SampleDensityWithNoise: 0.495
-  mappingStrategy: 0
-  debugMode: 0
-  outputTex: 2
-  savePath: 
 --- !u!4 &1480478201
 Transform:
   m_ObjectHideFlags: 0

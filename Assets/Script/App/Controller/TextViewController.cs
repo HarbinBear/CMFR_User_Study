@@ -6,7 +6,7 @@ using UnityEngine.PlayerLoop;
 
 namespace Framework.CMFR
 {
-    public class TextViewController : MonoBehaviour, IController
+    public class TextViewController : MonoBehaviour
     {
 
         public TextMeshProUGUI textComp;
@@ -14,6 +14,14 @@ namespace Framework.CMFR
         private void Start()
         {
             UpdateText();
+            
+            ICMFRModel model = CMFRDemo.Interface.GetModel<ICMFRModel>();
+            
+            model.sigma.Register(BindablePropertyUpdateText);
+            model.fx.Register(BindablePropertyUpdateText);
+            model.fy.Register(BindablePropertyUpdateText);
+            model.eyeX.Register(BindablePropertyUpdateText);
+            model.eyeY.Register(BindablePropertyUpdateText);
         }
 
         // 函数用于添加一行新文本
@@ -42,20 +50,31 @@ namespace Framework.CMFR
             }
         }
 
+        public void BindablePropertyUpdateText<T>(T value)
+        {
+            UpdateText();
+        }
+
         public void UpdateText()
         {
+            textComp.text = "";
             MakeLineFromModel("sigma");
             MakeLineFromModel("fx");
             MakeLineFromModel("fy");
             MakeLineFromModel("eyeX");
             MakeLineFromModel("eyeY");
             
-        } 
-        
-        IArchitecture IBelongToArchitecture.GetArchitecture()
-        {
-            return CMFRDemo.Interface;
         }
-        
+
+        private void OnDestroy()
+        {
+            ICMFRModel model = CMFRDemo.Interface.GetModel<ICMFRModel>();
+            
+            model.sigma.UnRegister(BindablePropertyUpdateText);
+            model.fx.UnRegister(BindablePropertyUpdateText);
+            model.fy.UnRegister(BindablePropertyUpdateText);
+            model.eyeX.UnRegister(BindablePropertyUpdateText);
+            model.eyeY.UnRegister(BindablePropertyUpdateText);
+        }
     }
 }

@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Reflection;
+using UnityEngine;
+using UnityEngine.PlayerLoop;
 using UnityEngine.Rendering;
 using UnityEngine.UI;
 
@@ -11,9 +13,13 @@ namespace Framework.CMFR
         
         public Material MatPass1;
         public Material MatPass2;
+        
+        private int lastScreenWidth = 0;
+        private int lastScreenHeight = 0;
 
         public void Init()
         {
+            Debug.Log("[CMFR Effect] Init");
             ICMFRModel model = CMFRDemo.Interface.GetModel<ICMFRModel>();
             
             // init material
@@ -32,12 +38,29 @@ namespace Framework.CMFR
             model.sigma.Register(OnSigmaChanged);
 
         }
-        
-        
+
+
+
+        public void Update()
+        {
+            if (Screen.width != lastScreenWidth || Screen.height != lastScreenHeight)
+            {
+                lastScreenHeight = Screen.height;
+                lastScreenWidth = Screen.width;
+                OnSigmaChanged( CMFRDemo.Interface.GetModel<ICMFRModel>().sigma );
+                
+            }
+        }
+
         public void RenderEffect(RenderTexture source, RenderTexture destination)
         {
             CMFRPass( source  );
             InvCMFRPass( destination  );
+        }
+
+        public void OnDestroy()
+        {
+            
         }
 
         void CMFRPass(RenderTexture source)
@@ -82,17 +105,28 @@ namespace Framework.CMFR
             MatPass2.SetInt("_iApplyRFRMap2", model.iApplyRFRMap1);
             
             Graphics.Blit(null, destination, MatPass2);
-            // destination = TexPass2; 
-            // Graphics.Blit( TexPass2 , destination );
         }
 
         void OnSigmaChanged(float sigma)
         {
+            
+            
             TexPass1.Release();
             TexPass1 = new RenderTexture(Mathf.RoundToInt(Screen.width / sigma), Mathf.RoundToInt(Screen.height / sigma), 24, RenderTextureFormat.Default);
             TexPass1.Create();
         }
+
+        void OnModelChanged<T>(string name, T value)
+        {
+            
+            PropertyInfo info = typeof(ICMFRModel).GetProperty(name);
+            if (info != null)
+            {
+                
+            } 
+        }
         
         
+
     }
 }
