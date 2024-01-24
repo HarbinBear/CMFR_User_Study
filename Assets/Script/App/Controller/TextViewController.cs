@@ -22,6 +22,7 @@ namespace Framework.CMFR
             model.fy.Register(BindablePropertyUpdateText);
             model.eyeX.Register(BindablePropertyUpdateText);
             model.eyeY.Register(BindablePropertyUpdateText);
+            model.mappingStrategy.Register(BindablePropertyUpdateText);
         }
 
         // 函数用于添加一行新文本
@@ -63,6 +64,8 @@ namespace Framework.CMFR
             MakeLineFromModel("fy");
             MakeLineFromModel("eyeX");
             MakeLineFromModel("eyeY");
+            MakeLineFromModel("mappingStrategy");
+            
             
         }
 
@@ -75,6 +78,8 @@ namespace Framework.CMFR
             model.fy.UnRegister(BindablePropertyUpdateText);
             model.eyeX.UnRegister(BindablePropertyUpdateText);
             model.eyeY.UnRegister(BindablePropertyUpdateText);
+            model.mappingStrategy.UnRegister(BindablePropertyUpdateText);
+            
         }
     }
 }

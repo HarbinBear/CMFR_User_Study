@@ -32,7 +32,7 @@ namespace Framework.CMFR
         BindableProperty<float> sampleDensityWithNoise { get;  }
         BindableProperty<float> squelchedGridMappingBeta { get;  }
         BindableProperty<float> focusDistance { get; set; }
-        BindableProperty<int> mappingStrategy { get;  }
+        BindableProperty<MappingStrategy> mappingStrategy { get;  }
         BindableProperty<int> iApplyRFRMap1 { get;  }
         BindableProperty<int> iApplyRFRMap2 { get;  }
         
@@ -99,9 +99,9 @@ namespace Framework.CMFR
             Value = 1
         };
 
-        public BindableProperty<int> mappingStrategy { get; } = new BindableProperty<int>()
+        public BindableProperty<MappingStrategy> mappingStrategy { get; } = new BindableProperty<MappingStrategy>()
         {
-            Value = 1
+            Value = MappingStrategy.Elliptical_Grid_Mapping
         }; 
         public BindableProperty<int> outputMode { get; } = new BindableProperty<int>()
         {

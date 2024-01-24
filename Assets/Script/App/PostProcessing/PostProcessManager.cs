@@ -19,7 +19,9 @@ namespace Framework.CMFR
         
         [Range(0.01f,0.99f)]
         public float _fy;
-
+        
+        public MappingStrategy _mappingStrategy;
+        
         // // sigma
         // [SerializeField, Range(1, 3)]
         // private float _sigma;
@@ -67,6 +69,7 @@ namespace Framework.CMFR
             model.sigma.Register(OnModelChanged);
             model.fx.Register(OnModelChanged);
             model.fy.Register(OnModelChanged);
+            model.mappingStrategy.Register(OnModelChanged);
         }
 
         // update all effects
@@ -127,6 +130,7 @@ namespace Framework.CMFR
             _sigma = model.sigma.Value;
             _fx = model.fx.Value;
             _fy = model.fy.Value;
+            _mappingStrategy = (MappingStrategy) model.mappingStrategy.Value;
             
             // view -> model 
             model.TexPass0.Value = texPass0;
@@ -152,6 +156,7 @@ namespace Framework.CMFR
         //     }
         // }
 
+        // 面板更新时，改动Model
         private void OnValidate()
         {
             ICMFRModel model = CMFRDemo.Interface.GetModel<ICMFRModel>();
@@ -161,6 +166,7 @@ namespace Framework.CMFR
             model.sigma.Value = _sigma;
             model.fx.Value = _fx;
             model.fy.Value = _fy;
+            model.mappingStrategy.Value = _mappingStrategy; 
         }
 
         private void OnDestroy()
@@ -171,6 +177,7 @@ namespace Framework.CMFR
             }
         }
 
+        // model 被（别处）改动时，更新Inspect面板。
         private void OnModelChanged<T>(T value)
         {
             ICMFRModel model = CMFRDemo.Interface.GetModel<ICMFRModel>();
@@ -178,6 +185,7 @@ namespace Framework.CMFR
             _sigma = model.sigma.Value;
             _fx = model.fx.Value;
             _fy = model.fy.Value;
+            _mappingStrategy = (MappingStrategy) model.mappingStrategy.Value;
         }
     }
 }

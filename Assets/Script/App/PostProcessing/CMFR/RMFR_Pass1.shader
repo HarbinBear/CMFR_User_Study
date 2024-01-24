@@ -172,33 +172,11 @@ Shader "CMFR/CMFR_Pass"
 					v = y * sqrt( 1 - xx / 2 );
 
 				}
-
-				//  Squelched Grid Open Mapping
-				if( _MappingStrategy == 2 )
-				{
-					float b = 1.0;
-					u = x * sqrt( ( 1 - b * yy ) / ( 1 - b * xx * yy ) );
-					v = y * sqrt( ( 1 - b * xx ) / ( 1 - b * xx * yy ) );
-					
-				}
-
-
-				// Blended E-Grid mapping
-				if ( _MappingStrategy == 3 )
-				{
-	
-					float beta = _SquelchedGridMappingBeta;
-					float a = beta + 1 - beta * xx;	
-					float b = beta + 1 - beta * yy;	
-					u = x * sqrt( ( yy * b - a*b ) / ( xx*yy - a*b ) );
-					v = y * sqrt( ( xx * b - a*b ) / ( xx*yy - a*b ) );
-						
-				}
-
+				
 
 				// FG Squiricle Mapping
 				// Square to Disk
-				if( _MappingStrategy == 4 )
+				if( _MappingStrategy == 3 )
 				{
 					float var1 = sqrt( xx + yy - xx * yy );
 					float var2 = sqrt( xx + yy );
@@ -209,55 +187,11 @@ Shader "CMFR/CMFR_Pass"
 
 				// 2-Squircular mapping
 				// Square to Disk
-				if( _MappingStrategy == 5 )
+				if( _MappingStrategy == 4 )
 				{
 					float var1 = sqrt( 1 + xx * yy );
 					u = x / var1 ;
 					v = y / var1 ;
-				}
-
-				// schwarz-christoffel
-				// Square to Disk
-				if( _MappingStrategy == 7 )
-				{
-					
-				}
-				
-
-				// hyperbolic
-				// Spuare to Disk
-				if( _MappingStrategy == 8 )
-				{
-					float a = 0.8;
-					float aa = a * a;
-					float bb = aa  / ( 1 - aa );
-					if( abs(x) > abs(y) )
-					{
-						u = sign(x) * sqrt( aa*xx + aa/bb*yy );
-						v = y;
-					}
-					if( abs(y) >= abs(x) )
-					{
-						v = sign(y) * sqrt( aa*yy + aa/bb*xx );
-						u = x;
-					}
-				}
-
-
-				// Simple Strech
-				// square to disk
-				if(_MappingStrategy == 11 )
-				{
-					if( xx >= yy )
-					{
-						u = sign(x) * xx    / ( sqrt( xx + yy ));
-						v = sign(x) * x * y / ( sqrt( xx + yy ));
-					}
-					else
-					{
-						u = sign(y) * x * y / ( sqrt( xx + yy ));
-						v = sign(y) * yy    / ( sqrt( xx + yy ));
-					}
 				}
 
 

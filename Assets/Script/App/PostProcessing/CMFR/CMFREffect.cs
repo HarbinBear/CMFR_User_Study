@@ -76,7 +76,7 @@ namespace Framework.CMFR
             MatPass1.SetFloat("_scaleRatio",model.sigma);
             MatPass1.SetFloat("_fx", model.fx);
             MatPass1.SetFloat("_fy", model.fy);
-            MatPass1.SetInt("_MappingStrategy" , (int)model.mappingStrategy);
+            MatPass1.SetInt("_MappingStrategy" , (int)model.mappingStrategy.Value);
             MatPass1.SetInt("_OutputMode", model.outputMode);
             MatPass1.SetInt("_iApplyRFRMap1", model.iApplyRFRMap1);
 
@@ -100,7 +100,7 @@ namespace Framework.CMFR
             MatPass2.SetFloat("_fx", model.fx);
             MatPass2.SetFloat("_fy", model.fy);
             MatPass2.SetTexture("_MidTex", TexPass1);
-            MatPass2.SetInt("_MappingStrategy" , (int)model.mappingStrategy);
+            MatPass2.SetInt("_MappingStrategy" , (int) model.mappingStrategy.Value);
             MatPass2.SetInt("_OutputMode", model.outputMode);
             MatPass2.SetInt("_iApplyRFRMap2", model.iApplyRFRMap1);
             
