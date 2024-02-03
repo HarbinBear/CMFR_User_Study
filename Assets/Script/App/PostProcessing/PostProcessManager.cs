@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Kino;
 using UnityEngine;
 
 namespace Framework.CMFR
@@ -58,6 +59,7 @@ namespace Framework.CMFR
             Debug.Log("[Post Process Manager] Start");
 
             RegisterEffect( new CMFREffect() );
+            RegisterEffect( new BokehEffect() );
             
             foreach (var effect in effects)
             {
@@ -93,31 +95,26 @@ namespace Framework.CMFR
         // 后处理的总入口。
         private void OnRenderImage(RenderTexture source, RenderTexture destination)
         {
-            
-            
             RenderTexture currentSource = source;
             RenderTexture currentDestination;
-
             for (int i = 0; i < effects.Count - 1; i++)
             {
                 // 为每个效果创建一个新的destination纹理
                 currentDestination = RenderTexture.GetTemporary(source.width, source.height);
-            
+                
                 // 调用效果渲染
                 effects[i].RenderEffect(currentSource, currentDestination);
-
+                
                 // 交换源和目标纹理，为下个效果准备
                 if (currentSource != source)
                 {
                     RenderTexture.ReleaseTemporary(currentSource);
                 }
-
                 currentSource = currentDestination;
             }
-
             // 最后一个效果直接渲染到最终的destination纹理
             effects[effects.Count - 1].RenderEffect(currentSource, destination);
-
+            
             // 释放最后一个临时纹理（如果有使用的话）
             if (currentSource != source)
             {

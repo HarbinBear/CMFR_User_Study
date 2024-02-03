@@ -7,8 +7,6 @@ namespace Framework.CMFR
         void Init();
         void Update();
         void RenderEffect(RenderTexture source, RenderTexture destination);
-
         void OnDestroy();
-
     }
 }

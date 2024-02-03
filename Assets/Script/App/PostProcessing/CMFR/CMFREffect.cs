@@ -121,7 +121,14 @@ namespace Framework.CMFR
             
             
             TexPass1.Release();
-            TexPass1 = new RenderTexture(Mathf.RoundToInt(Screen.width / sigma), Mathf.RoundToInt(Screen.height / sigma), 24, RenderTextureFormat.Default);
+            Resolution res = Screen.currentResolution;
+            
+            TexPass1 = new RenderTexture(
+                Mathf.RoundToInt(res.width / sigma), 
+                Mathf.RoundToInt(res.height / sigma),
+                24, 
+                    RenderTextureFormat.Default
+                );
             TexPass1.Create();
         }
 
