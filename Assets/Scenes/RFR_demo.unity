@@ -332,11 +332,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _pointOfFocus: {fileID: 0}
   _focusDistance: 10
-  _fNumber: 0.1
+  _fNumber: 1.5
   _useCameraFov: 0
   _focalLength: 0.05
   _kernelSize: 1
-  _visualize: 1
+  _visualize: 0
   _shader: {fileID: 0}
 --- !u!1 &195843962
 GameObject:
@@ -1122,6 +1122,7 @@ GameObject:
   - component: {fileID: 216475879}
   - component: {fileID: 216475881}
   - component: {fileID: 216475880}
+  - component: {fileID: 216475882}
   m_Layer: 0
   m_Name: grey_and_white_room:Mesh_grey_and_white_room:polySurface1
   m_TagString: Untagged
@@ -1212,6 +1213,20 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 216475878}
+  m_Mesh: {fileID: -8098590186997190170, guid: 779af7b657a99c746bcde49cbba3c860, type: 3}
+--- !u!64 &216475882
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 216475878}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
   m_Mesh: {fileID: -8098590186997190170, guid: 779af7b657a99c746bcde49cbba3c860, type: 3}
 --- !u!1 &239079384
 GameObject:
@@ -2384,6 +2399,7 @@ GameObject:
   - component: {fileID: 559355033}
   - component: {fileID: 559355035}
   - component: {fileID: 559355034}
+  - component: {fileID: 559355036}
   m_Layer: 0
   m_Name: grey_and_white_room:pPlane1_grey_and_white_room:polySurface1
   m_TagString: Untagged
@@ -2455,6 +2471,20 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 559355032}
+  m_Mesh: {fileID: 4300012, guid: 779af7b657a99c746bcde49cbba3c860, type: 3}
+--- !u!64 &559355036
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 559355032}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
   m_Mesh: {fileID: 4300012, guid: 779af7b657a99c746bcde49cbba3c860, type: 3}
 --- !u!1 &562433514
 GameObject:
@@ -2976,6 +3006,7 @@ GameObject:
   - component: {fileID: 1182904184}
   - component: {fileID: 1182904186}
   - component: {fileID: 1182904185}
+  - component: {fileID: 1182904187}
   m_Layer: 0
   m_Name: grey_and_white_room:group1_grey_and_white_room:pasted__group_grey_and_white_room:pasted__pasted__pPlane1_grey_and_white_room:polySurface1
   m_TagString: Untagged
@@ -3047,6 +3078,20 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1182904183}
+  m_Mesh: {fileID: 4300000, guid: 779af7b657a99c746bcde49cbba3c860, type: 3}
+--- !u!64 &1182904187
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1182904183}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
   m_Mesh: {fileID: 4300000, guid: 779af7b657a99c746bcde49cbba3c860, type: 3}
 --- !u!1 &1230921068
 GameObject:
@@ -3249,6 +3294,7 @@ GameObject:
   - component: {fileID: 1609270215}
   - component: {fileID: 1609270217}
   - component: {fileID: 1609270216}
+  - component: {fileID: 1609270218}
   m_Layer: 0
   m_Name: grey_and_white_room:group2_grey_and_white_room:pasted__group1_grey_and_white_room:pasted__pasted__group_grey_and_white_room:pasted__pasted__pasted__pPlane1_grey_and_white_room:polySurface1
   m_TagString: Untagged
@@ -3320,6 +3366,20 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1609270214}
+  m_Mesh: {fileID: 4300002, guid: 779af7b657a99c746bcde49cbba3c860, type: 3}
+--- !u!64 &1609270218
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1609270214}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
   m_Mesh: {fileID: 4300002, guid: 779af7b657a99c746bcde49cbba3c860, type: 3}
 --- !u!1 &1636720528
 GameObject:
@@ -3503,6 +3563,7 @@ GameObject:
   - component: {fileID: 1918043466}
   - component: {fileID: 1918043468}
   - component: {fileID: 1918043467}
+  - component: {fileID: 1918043469}
   m_Layer: 0
   m_Name: grey_and_white_room:group_grey_and_white_room:pasted__pPlane1_grey_and_white_room:polySurface1
   m_TagString: Untagged
@@ -3574,6 +3635,20 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1918043465}
+  m_Mesh: {fileID: 4300004, guid: 779af7b657a99c746bcde49cbba3c860, type: 3}
+--- !u!64 &1918043469
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1918043465}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  serializedVersion: 4
+  m_Convex: 0
+  m_CookingOptions: 30
   m_Mesh: {fileID: 4300004, guid: 779af7b657a99c746bcde49cbba3c860, type: 3}
 --- !u!1 &1937497560
 GameObject:

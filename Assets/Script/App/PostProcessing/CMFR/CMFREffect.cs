@@ -122,10 +122,13 @@ namespace Framework.CMFR
             
             TexPass1.Release();
             Resolution res = Screen.currentResolution;
+
+            int screenW = 2160;
+            int screenH = 2160;
             
             TexPass1 = new RenderTexture(
-                Mathf.RoundToInt(res.width / sigma), 
-                Mathf.RoundToInt(res.height / sigma),
+                Mathf.RoundToInt(screenW / sigma), 
+                Mathf.RoundToInt(screenH / sigma),
                 24, 
                     RenderTextureFormat.Default
                 );

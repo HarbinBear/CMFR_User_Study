@@ -48,7 +48,7 @@ namespace Framework.CMFR
             {
                 model.focusDistance.Value = 2;
             }
-            Debug.Log("[BokehEffect] focus distance: " + model.focusDistance.Value);
+            // Debug.Log("[BokehEffect] focus distance: " + model.focusDistance.Value);
 
             // CommandBuffer cmd = new CommandBuffer();
             // cmd.name = "Bokeh";
