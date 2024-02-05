@@ -46,7 +46,7 @@ namespace Framework.CMFR
             }
             else
             {
-                model.focusDistance.Value = 2;
+                model.focusDistance.Value = 10000;
             }
             // Debug.Log("[BokehEffect] focus distance: " + model.focusDistance.Value);
 

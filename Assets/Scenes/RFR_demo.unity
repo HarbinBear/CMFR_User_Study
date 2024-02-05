@@ -217,7 +217,7 @@ MonoBehaviour:
   m_UpdateType: 0
   m_IgnoreTrackingState: 0
   m_PositionInput:
-    m_UseReference: 0
+    m_UseReference: 1
     m_Action:
       m_Name: Main Camera - TPD - Position
       m_Type: 0
@@ -242,8 +242,16 @@ MonoBehaviour:
         m_Groups: 
         m_Action: Main Camera - TPD - Position
         m_Flags: 0
+      - m_Name: 
+        m_Id: 0fd8837e-24d1-4614-b2af-fdf75584f319
+        m_Path: 
+        m_Interactions: 
+        m_Processors: 
+        m_Groups: 
+        m_Action: Main Camera - TPD - Position
+        m_Flags: 0
       m_Flags: 0
-    m_Reference: {fileID: 0}
+    m_Reference: {fileID: 3220680263695665919, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   m_RotationInput:
     m_UseReference: 0
     m_Action:
@@ -291,7 +299,7 @@ MonoBehaviour:
         m_Action: Main Camera - TPD - Tracking State
         m_Flags: 0
       m_Flags: 0
-    m_Reference: {fileID: 0}
+    m_Reference: {fileID: 2069149553511882089, guid: c348712bda248c246b8c49b3db54643f, type: 3}
   m_PositionAction:
     m_Name: 
     m_Type: 0
@@ -332,7 +340,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _pointOfFocus: {fileID: 0}
   _focusDistance: 10
-  _fNumber: 1.5
+  _fNumber: 20
   _useCameraFov: 0
   _focalLength: 0.05
   _kernelSize: 1
@@ -2582,6 +2590,7 @@ GameObject:
   m_Component:
   - component: {fileID: 652779720}
   - component: {fileID: 652779719}
+  - component: {fileID: 652779721}
   m_Layer: 0
   m_Name: Game
   m_TagString: Untagged
@@ -2616,6 +2625,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 6
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &652779721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 652779718}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 21b4718ce86246faa658ce6302b3449a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &694014264
 GameObject:
   m_ObjectHideFlags: 0
@@ -2715,8 +2736,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 694014264}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.4, y: -0.3176793, z: -2.405}
+  m_LocalRotation: {x: 0, y: -0.38268343, z: 0, w: 0.92387956}
+  m_LocalPosition: {x: -2.4, y: -0.797, z: -2.405}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -2725,7 +2746,7 @@ Transform:
   - {fileID: 2084248097}
   m_Father: {fileID: 0}
   m_RootOrder: 4
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: -45, z: 0}
 --- !u!1 &902725936
 GameObject:
   m_ObjectHideFlags: 0
@@ -3247,7 +3268,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   texPass0: {fileID: 8400000, guid: fd738ba93abf3f9488660d01c6486d40, type: 2}
-  _original: 0
+  _original: 1
   _sigma: 0
   _fx: 0
   _fy: 0

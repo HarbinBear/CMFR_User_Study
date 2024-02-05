@@ -9,6 +9,7 @@ namespace Framework.CMFR
             Debug.Log("[CMFRDemo] Init");
             RegisterSystem<IRenderSystem>( new RenderSystem() );
             RegisterModel<ICMFRModel>( new CMFRModel() );
+            // RegisterSystem<IEyeTrackSystem>( new EyeTrackingSystem() );
         }
     }
 }
