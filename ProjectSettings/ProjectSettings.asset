@@ -158,6 +158,7 @@ PlayerSettings:
   androidMaxAspectRatio: 2.1
   applicationIdentifier:
     Android: com.Brown.RMFR
+    Standalone: com.Brown.RMFR
   buildNumber:
     Standalone: 0
     iPhone: 0

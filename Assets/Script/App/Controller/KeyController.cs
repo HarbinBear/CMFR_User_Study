@@ -76,19 +76,19 @@ namespace Framework.CMFR
                 model.eyeX.Value += deltaX;
                 model.eyeY.Value += deltaY;
 
-                Math.Clamp(model.eyeX.Value, 0.05f, 0.95f);
-                Math.Clamp(model.eyeY.Value, 0.05f, 0.95f);
+                model.eyeX.Value = Math.Clamp(model.eyeX.Value, 0.05f, 0.95f);
+                model.eyeY.Value = Math.Clamp(model.eyeY.Value, 0.05f, 0.95f);
 
             }
 
         }
-
+        
 
         void ChangeFx(float delta)
         {
             ICMFRModel model = CMFRDemo.Interface.GetModel<ICMFRModel>();
             model.fx.Value += delta; 
-            Math.Clamp(model.fx.Value, 0.05f, 0.95f);
+            model.fx.Value = Math.Clamp(model.fx.Value, 0.05f, 0.95f);
 
         }
         
@@ -96,7 +96,7 @@ namespace Framework.CMFR
         {
             ICMFRModel model = CMFRDemo.Interface.GetModel<ICMFRModel>();
             model.fy.Value += delta; 
-            Math.Clamp(model.fy.Value, 0.05f, 0.95f);
+            model.fy.Value = Math.Clamp(model.fy.Value, 0.05f, 0.95f);
 
         }
     }
